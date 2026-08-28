@@ -506,8 +506,13 @@ st.markdown(
     /* selector button inside each card */
     .scan-mode-card div.stButton > button {
         margin-top: 8px;
-        min-height: 42px !important;
-        border-radius: 10px !important;
+        width: auto !important;
+        min-width: 88px !important;
+        min-height: 32px !important;
+        height: 32px !important;
+        padding: 0 12px !important;
+        border-radius: 999px !important;
+        font-size: .78rem !important;
         font-weight: 800 !important;
         transition: none !important;
         box-shadow: none !important;
@@ -904,10 +909,10 @@ with c1:
 
         full_selected = st.session_state.scan_mode == "Full Scan"
         if st.button(
-            "✓ Full Scan" if full_selected else "เลือก Full Scan",
+            "✓ Full Scan" if full_selected else "Full Scan",
             key="select_full_scan",
             type="primary" if full_selected else "secondary",
-            use_container_width=True,
+            use_container_width=False,
         ):
             st.session_state.scan_mode = "Full Scan"
             st.rerun()
@@ -929,10 +934,10 @@ with c2:
 
         quick_selected = st.session_state.scan_mode == "Quick Scan"
         if st.button(
-            "✓ Quick Scan" if quick_selected else "เลือก Quick Scan",
+            "✓ Quick Scan" if quick_selected else "Quick Scan",
             key="select_quick_scan",
             type="primary" if quick_selected else "secondary",
-            use_container_width=True,
+            use_container_width=False,
         ):
             st.session_state.scan_mode = "Quick Scan"
             st.rerun()
