@@ -454,11 +454,14 @@ st.markdown(
 
     .scan-option-wrap div[data-testid="stVerticalBlockBorderWrapper"] {
         border-radius: 16px !important;
-        border: 1px solid #e0e6ef !important;
+        border: 1px solid #dfe5ef !important;
         background: linear-gradient(155deg, #ffffff 0%, #fbfcff 100%) !important;
-        box-shadow: 0 8px 22px rgba(32,45,81,.045) !important;
+        box-shadow:
+            0 8px 22px rgba(32,45,81,.045),
+            0 1px 2px rgba(32,45,81,.025) !important;
         padding: 0 !important;
         transition: none !important;
+        overflow: hidden !important;
     }
 
     .scan-option-wrap.selected div[data-testid="stVerticalBlockBorderWrapper"] {
@@ -469,6 +472,15 @@ st.markdown(
 
     .scan-option-wrap div[data-testid="stVerticalBlockBorderWrapper"]:hover {
         transform: none !important;
+        border-color: #dfe5ef !important;
+        box-shadow:
+            0 8px 22px rgba(32,45,81,.045),
+            0 1px 2px rgba(32,45,81,.025) !important;
+    }
+
+    .scan-option-wrap.selected div[data-testid="stVerticalBlockBorderWrapper"]:hover {
+        border-color: #ff4b55 !important;
+        box-shadow: 0 10px 24px rgba(255,75,85,.06) !important;
     }
 
     .scan-title-row {
@@ -530,17 +542,16 @@ st.markdown(
 
     /* tiny circle button in the top-right of the card */
     .scan-radio-btn div.stButton > button {
-        width: 24px !important;
-        min-width: 24px !important;
-        height: 24px !important;
-        min-height: 24px !important;
+        width: 22px !important;
+        min-width: 22px !important;
+        height: 22px !important;
+        min-height: 22px !important;
         padding: 0 !important;
-        border-radius: 50% !important;
+        border-radius: 999px !important;
         margin: 2px 0 0 auto !important;
         box-shadow: none !important;
         transition: none !important;
-        font-size: .82rem !important;
-        font-weight: 900 !important;
+        font-size: 0 !important;
         line-height: 1 !important;
     }
 
@@ -555,7 +566,20 @@ st.markdown(
     .scan-radio-btn div.stButton > button[kind="primary"] {
         background: #ff4b55 !important;
         border: 1px solid #ff4b55 !important;
-        color: #ffffff !important;
+        color: transparent !important;
+        position: relative !important;
+    }
+
+    .scan-radio-btn div.stButton > button[kind="primary"]::after {
+        content: "✓";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-size: .72rem;
+        font-weight: 900;
     }
 
     .scan-radio-btn div.stButton > button[kind="primary"] *,
@@ -954,7 +978,7 @@ with c1:
         with radio_col:
             st.markdown('<div class="scan-radio-btn">', unsafe_allow_html=True)
             if st.button(
-                "✓" if full_selected else "○",
+                " ",
                 key="select_full_scan_card",
                 type="primary" if full_selected else "secondary",
                 help="เลือก Full Scan",
@@ -998,7 +1022,7 @@ with c2:
         with radio_col:
             st.markdown('<div class="scan-radio-btn">', unsafe_allow_html=True)
             if st.button(
-                "✓" if quick_selected else "○",
+                " ",
                 key="select_quick_scan_card",
                 type="primary" if quick_selected else "secondary",
                 help="เลือก Quick Scan",
