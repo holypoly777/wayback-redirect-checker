@@ -43,270 +43,234 @@ st.set_page_config(
 st.markdown(
     """
 
+
 <style>
-:root {
-    --bg: #f6f8fc;
-    --surface: #ffffff;
-    --text: #182033;
-    --muted: #667085;
-    --line: #dde3ee;
-    --blue: #2f5bd3;
-    --blue2: #466ee8;
-    --red: #ff4d57;
-    --red2: #f32655;
-    --amber: #f3a51f;
+:root{
+  --bg:#f6f8fc;
+  --surface:#ffffff;
+  --text:#182033;
+  --muted:#6f7b90;
+  --line:#dce3ee;
+  --blue:#315fdf;
+  --blue2:#4f73ed;
+  --red:#ff4e58;
+  --pink:#f6245a;
+  --amber:#f7ae24;
 }
 
-.stApp {
-    background:
-        radial-gradient(circle at 92% 4%, rgba(74,110,232,.10), transparent 22%),
-        radial-gradient(circle at 7% 0%, rgba(120,93,220,.07), transparent 20%),
-        linear-gradient(180deg, #fbfcff 0%, #f6f8fc 52%, #f4f6fa 100%);
-    color: var(--text);
+.stApp{
+  background:
+    radial-gradient(circle at 92% 3%, rgba(75,111,232,.10), transparent 22%),
+    radial-gradient(circle at 8% 0%, rgba(120,93,220,.06), transparent 18%),
+    linear-gradient(180deg,#fbfcff 0%,#f6f8fc 55%,#f4f6fa 100%);
+  color:var(--text);
 }
 
-.block-container {
-    max-width: 1180px;
-    padding-top: 1.8rem;
-    padding-bottom: 3rem;
+.block-container{
+  max-width:1180px;
+  padding-top:1.7rem;
+  padding-bottom:3rem;
 }
 
-h1,h2,h3,h4 {
-    color: var(--text);
-    letter-spacing: -.025em;
-}
+h1,h2,h3,h4{color:var(--text);letter-spacing:-.025em}
 
 /* HERO */
-.hero {
-    position: relative;
-    overflow: hidden;
-    padding: 26px 28px;
-    border: 1px solid #dfe5ef;
-    border-radius: 20px;
-    background: linear-gradient(135deg, rgba(255,255,255,.99), rgba(247,249,255,.97));
-    box-shadow: 0 18px 45px rgba(33,48,90,.07);
-    margin-bottom: 26px;
+.hero{
+  position:relative;
+  overflow:hidden;
+  padding:24px 28px;
+  border:1px solid #e0e6ef;
+  border-radius:18px;
+  background:linear-gradient(135deg,rgba(255,255,255,.99),rgba(248,250,255,.97));
+  box-shadow:0 16px 40px rgba(33,48,90,.07);
+  margin-bottom:24px;
 }
-.hero::after {
-    content:"";
-    position:absolute;
-    width:320px;
-    height:220px;
-    right:-100px;
-    top:-120px;
-    border-radius:50%;
-    background: radial-gradient(circle, rgba(70,110,232,.17), transparent 68%);
+.hero::after{
+  content:"";
+  position:absolute;
+  width:330px;height:220px;
+  right:-95px;top:-120px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(75,111,232,.18),transparent 68%);
 }
-.hero-title {
-    position: relative;
-    z-index: 1;
-    font-size: 2rem;
-    font-weight: 850;
-    background: linear-gradient(90deg,#20439b,#466ee8,#7658d8);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
+.hero-title{
+  position:relative;z-index:1;
+  font-size:2rem;font-weight:850;
+  color:#1d2942;
+  -webkit-text-fill-color:#1d2942;
 }
-.hero-sub {
-    position: relative;
-    z-index: 1;
-    margin-top: 8px;
-    color:#68748a;
+.hero-sub{
+  position:relative;z-index:1;
+  color:#69758a;margin-top:8px;font-size:.96rem;
 }
 
-/* DOMAIN */
-.domain-shell {
-    padding: 21px 22px 16px;
-    border: 1px solid #dde4ef;
-    border-radius: 17px;
-    background: rgba(255,255,255,.94);
-    box-shadow: 0 10px 26px rgba(33,48,90,.045);
-    margin-bottom: 22px;
+/* SECTION TITLE */
+.section-head{
+  display:flex;align-items:center;gap:12px;
+  margin:4px 0 12px;
 }
-.domain-title {
-    font-size: 1.15rem;
-    font-weight: 800;
-    color:#1c2740;
+.section-icon{
+  width:42px;height:42px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,#eef3ff,#e6edff);
+  color:#315fdf;font-size:1.15rem;
+  box-shadow:0 3px 10px rgba(49,95,223,.08);
 }
-.domain-desc {
-    color:#7a8496;
-    font-size:.87rem;
-    margin:5px 0 13px;
+.section-icon.red{
+  background:linear-gradient(145deg,#fff1f3,#ffe6ea);
+  color:#ef4052;
+}
+.section-title{font-weight:850;font-size:1.2rem;color:#1c2740}
+.section-sub{font-size:.84rem;color:#7b8598;margin-top:2px}
+
+/* DOMAIN CARD */
+.domain-card{
+  border:1px solid #dce3ee;
+  border-radius:16px;
+  background:rgba(255,255,255,.95);
+  box-shadow:0 10px 26px rgba(33,48,90,.045);
+  padding:20px 20px 16px;
+  margin-bottom:24px;
+}
+[data-testid="stTextInput"] input{
+  min-height:50px;
+  border-radius:10px;
+  background:#fff;
+  color:#172033;
+  border:1px solid #cdd7e6;
+  box-shadow:0 4px 12px rgba(35,50,90,.025);
+}
+[data-testid="stTextInput"] input:focus{
+  border-color:#3d68df;
+  box-shadow:0 0 0 4px rgba(61,104,223,.10);
 }
 
-[data-testid="stTextInput"] input {
-    background:#fff;
-    color:#172033;
-    min-height:50px;
-    border:1px solid #cfd7e5;
-    border-radius:11px;
-    box-shadow:0 4px 12px rgba(35,50,90,.03);
+/* BLUE DOMAIN CHECK BUTTON */
+.domain-check div.stButton > button{
+  min-height:50px !important;
+  border-radius:10px !important;
+  background:linear-gradient(90deg,#315fdf,#416ce8) !important;
+  border:none !important;
+  color:#fff !important;
+  font-weight:800 !important;
+  box-shadow:0 8px 18px rgba(49,95,223,.17) !important;
 }
-[data-testid="stTextInput"] input:focus {
-    border-color:#3f69df;
-    box-shadow:0 0 0 4px rgba(63,105,223,.10);
-}
-
-/* MODE HEADING */
-.mode-heading {
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin: 4px 0 13px;
-}
-.mode-icon {
-    width:38px;height:38px;
-    display:flex;align-items:center;justify-content:center;
-    border-radius:10px;
-    background:linear-gradient(145deg,#fff0f2,#ffe4e8);
-    color:#ef4052;
-    font-size:1.05rem;
-}
-.mode-title {
-    font-weight:850;
-    font-size:1.22rem;
-    color:#1b263d;
-}
-.mode-sub {
-    color:#798396;
-    font-size:.84rem;
+.domain-check div.stButton > button *{
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
 }
 
-/* STREAMLIT BORDERED CONTAINERS USED AS SCAN CARDS */
-[data-testid="stVerticalBlockBorderWrapper"] {
-    border-radius:16px !important;
-    background:linear-gradient(145deg,#ffffff,#fbfcff) !important;
-    border:1px solid #dfe5ee !important;
-    box-shadow:0 9px 24px rgba(34,47,80,.045) !important;
-    transition:transform .16s ease, box-shadow .16s ease;
+/* SCAN CARDS */
+[data-testid="stVerticalBlockBorderWrapper"]{
+  border-radius:16px !important;
+  border:1px solid #dfe5ee !important;
+  background:linear-gradient(145deg,#fff,#fbfcff) !important;
+  box-shadow:0 9px 24px rgba(34,47,80,.045) !important;
+  transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
 }
-[data-testid="stVerticalBlockBorderWrapper"]:hover {
-    transform:translateY(-2px);
-    box-shadow:0 14px 30px rgba(34,47,80,.07) !important;
-}
-
-/* MODE BUTTONS */
-div.stButton > button {
-    border-radius:12px;
-    min-height:50px;
-    font-weight:800;
-    transition:all .16s ease;
-}
-div.stButton > button[kind="secondary"] {
-    background:linear-gradient(180deg,#ffffff,#f8faff);
-    color:#26334d !important;
-    border:1px solid #d4dce9;
-    box-shadow:0 5px 13px rgba(35,49,85,.035);
-}
-div.stButton > button[kind="secondary"]:hover {
-    border-color:#b9c5da;
-    transform:translateY(-1px);
+[data-testid="stVerticalBlockBorderWrapper"]:hover{
+  transform:translateY(-2px);
+  box-shadow:0 14px 30px rgba(34,47,80,.07) !important;
 }
 
-/* Selected scan mode + main CTA both use primary.
-   High contrast is forced here. */
-div.stButton > button[kind="primary"] {
-    background:linear-gradient(90deg,#ff4d57 0%,#f32655 100%);
-    border:none !important;
-    color:#fff !important;
-    box-shadow:0 10px 22px rgba(243,38,85,.18);
+/* MODE BUTTONS: both stay light, selection is shown via badges/content */
+.mode-button div.stButton > button{
+  min-height:54px !important;
+  border-radius:12px !important;
+  background:linear-gradient(180deg,#fff,#f8faff) !important;
+  color:#1f2b43 !important;
+  border:1px solid #d5ddea !important;
+  font-weight:850 !important;
+  box-shadow:0 5px 14px rgba(35,49,85,.035) !important;
 }
-div.stButton > button[kind="primary"] *,
-div.stButton > button[kind="primary"] p,
-div.stButton > button[kind="primary"] span {
-    color:#fff !important;
-    -webkit-text-fill-color:#fff !important;
+.mode-button div.stButton > button *{
+  color:#1f2b43 !important;
+  -webkit-text-fill-color:#1f2b43 !important;
 }
-div.stButton > button[kind="primary"]:hover {
-    filter:brightness(1.035);
-    transform:translateY(-1px);
-    box-shadow:0 14px 27px rgba(243,38,85,.22);
+.mode-button div.stButton > button:hover{
+  border-color:#b6c3da !important;
+  transform:translateY(-1px);
 }
-
-.scan-copy {
-    padding: 2px 4px 5px;
-    color:#516076;
-    line-height:1.65;
-    font-size:.92rem;
+.mode-copy{
+  padding:4px 4px 8px;
+  color:#536177;
+  line-height:1.6;
+  font-size:.92rem;
 }
-.scan-copy b {
-    color:#29364d;
+.mode-copy b{color:#29364d}
+.mode-note{margin-top:7px;color:#818c9f;font-size:.83rem}
+.mode-selected{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 9px;border-radius:999px;
+  background:#ffe9ec;border:1px solid #ffd1d7;
+  color:#df3b4d;font-size:.75rem;font-weight:850;
+  margin:0 0 6px 2px;
 }
-.scan-note {
-    color:#858fa1;
-    font-size:.82rem;
-    margin-top:5px;
-}
-.recommend-badge {
-    display:inline-block;
-    padding:3px 8px;
-    margin-left:5px;
-    border-radius:999px;
-    background:#ffe7ea;
-    border:1px solid #ffd0d5;
-    color:#e3384a;
-    font-size:.72rem;
-    font-weight:800;
+.mode-unselected{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 9px;border-radius:999px;
+  background:#f5f7fb;border:1px solid #e1e6ef;
+  color:#7c8799;font-size:.75rem;font-weight:750;
+  margin:0 0 6px 2px;
 }
 
-/* SELECTED STATUS */
-.selected-mode {
-    display:inline-flex;
-    align-items:center;
-    gap:7px;
-    padding:7px 11px;
-    margin:10px 0 12px;
-    border-radius:999px;
-    background:linear-gradient(90deg,#fff0f2,#fff6f7);
-    border:1px solid #ffd4d9;
-    color:#d93b4c;
-    font-size:.83rem;
-    font-weight:800;
+/* INFO */
+[data-testid="stAlert"]{border-radius:12px}
+
+/* CTA */
+.cta div.stButton > button{
+  min-height:52px !important;
+  border-radius:12px !important;
+  background:linear-gradient(90deg,#f6245a,#ff4e58) !important;
+  border:none !important;
+  color:#fff !important;
+  font-size:1rem !important;
+  font-weight:850 !important;
+  box-shadow:0 12px 24px rgba(246,36,90,.20) !important;
+}
+.cta div.stButton > button *{
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+}
+.cta div.stButton > button:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.025);
+  box-shadow:0 16px 28px rgba(246,36,90,.23) !important;
 }
 
-/* INFO / METRIC / RESULTS */
-[data-testid="stAlert"] {
-    border-radius:12px;
+/* RESULTS */
+div[data-testid="stMetric"]{
+  background:linear-gradient(145deg,#fff,#fbfcff);
+  border:1px solid #e0e6ef;
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 8px 20px rgba(32,45,81,.04);
 }
-div[data-testid="stMetric"] {
-    background:linear-gradient(145deg,#fff,#fbfcff);
-    border:1px solid #e0e6ef;
-    border-radius:14px;
-    padding:16px;
-    box-shadow:0 8px 20px rgba(32,45,81,.04);
-}
-div[data-testid="stMetricLabel"] { color:#6c768a; }
-div[data-testid="stMetricValue"] { color:#172033; font-weight:800; }
+div[data-testid="stMetricLabel"]{color:#6c768a}
+div[data-testid="stMetricValue"]{color:#172033;font-weight:800}
 
-.evidence {
-    border:1px solid #efc8ce;
-    border-left:4px solid #dd4858;
-    border-radius:14px;
-    padding:18px;
-    background:linear-gradient(145deg,#fff,#fff6f7);
-    margin:12px 0;
-    box-shadow:0 10px 24px rgba(140,35,50,.05);
+.evidence{
+  border:1px solid #efc8ce;
+  border-left:4px solid #dd4858;
+  border-radius:14px;
+  padding:18px;
+  background:linear-gradient(145deg,#fff,#fff6f7);
+  margin:12px 0;
+  box-shadow:0 10px 24px rgba(140,35,50,.05);
 }
-.evidence div { color:#293247 !important; }
-.evidence div[style*="color:#ff8899"] { color:#c53c4c !important; }
-.evidence div[style*="color:#9aa6c3"] { color:#747f91 !important; }
+.evidence div{color:#293247 !important}
+.evidence div[style*="color:#ff8899"]{color:#c53c4c !important}
+.evidence div[style*="color:#9aa6c3"]{color:#747f91 !important}
 
-[data-testid="stExpander"] {
-    background:#fff;
-    border-color:#e0e6ee;
-    border-radius:12px;
-}
-[data-testid="stDownloadButton"] button,
-[data-testid="stLinkButton"] a {
-    border-radius:10px !important;
+[data-testid="stExpander"]{
+  background:#fff;border-color:#e0e6ee;border-radius:12px;
 }
 
-.footer-note {
-    color:#8a94a6;
-    text-align:center;
-    font-size:.82rem;
-    margin-top:28px;
+.footer-note{
+  color:#8a94a6;text-align:center;font-size:.82rem;margin-top:28px;
 }
 </style>
+
 
     """,
     unsafe_allow_html=True,
@@ -635,34 +599,52 @@ st.markdown(
 
 st.markdown(
     """
-    <div class="domain-shell">
-        <div class="domain-title">🌐 ตรวจสอบ Domain</div>
-        <div class="domain-desc">กรอกชื่อ Domain ที่ต้องการตรวจสอบ เช่น idea.me หรือ footballgibraltar.com</div>
+    <div class="section-head">
+      <div class="section-icon">🌐</div>
+      <div>
+        <div class="section-title">ตรวจสอบ Domain</div>
+        <div class="section-sub">กรอก Domain ที่ต้องการตรวจสอบ</div>
+      </div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-domain_input = st.text_input(
-    "Domain",
-    placeholder="เช่น idea.me หรือ footballgibraltar.com",
-    label_visibility="collapsed",
-)
+# input + small blue validation button
+input_col, check_col = st.columns([6.5, 1.2], gap="small")
+
+with input_col:
+    domain_input = st.text_input(
+        "Domain",
+        placeholder="เช่น idea.me หรือ footballgibraltar.com",
+        label_visibility="collapsed",
+    )
+
+with check_col:
+    st.markdown('<div class="domain-check">', unsafe_allow_html=True)
+    check_domain = st.button("🔍 ตรวจสอบ", use_container_width=True, key="validate_domain")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+if check_domain:
+    preview_domain = normalize_domain(domain_input)
+    if preview_domain and "." in preview_domain:
+        st.success(f"รูปแบบ Domain ใช้งานได้: {preview_domain}")
+    else:
+        st.warning("กรุณาใส่ Domain ให้ถูกต้อง เช่น idea.me")
 
 st.markdown(
     """
-    <div class="mode-heading">
-        <div class="mode-icon">🎯</div>
-        <div>
-            <div class="mode-title">เลือกโหมดการสแกน</div>
-            <div class="mode-sub">เลือกโหมดที่เหมาะกับความต้องการของคุณ</div>
-        </div>
+    <div class="section-head" style="margin-top:22px;">
+      <div class="section-icon red">🎯</div>
+      <div>
+        <div class="section-title">เลือกโหมดการสแกน</div>
+        <div class="section-sub">เลือกโหมดที่เหมาะกับความต้องการของคุณ</div>
+      </div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-# เก็บโหมดที่เลือกไว้ใน session
 if "scan_mode" not in st.session_state:
     st.session_state.scan_mode = "Full Scan"
 
@@ -670,24 +652,23 @@ full_col, quick_col = st.columns(2, gap="medium")
 
 with full_col:
     with st.container(border=True):
-        full_selected = st.session_state.scan_mode == "Full Scan"
+        if st.session_state.scan_mode == "Full Scan":
+            st.markdown('<div class="mode-selected">✓ เลือกอยู่ · แนะนำ</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="mode-unselected">○ ยังไม่ได้เลือก</div>', unsafe_allow_html=True)
 
-        if st.button(
-            "🔍 Full Scan  ·  แนะนำ",
-            key="choose_full_scan",
-            type="primary" if full_selected else "secondary",
-            use_container_width=True,
-            help="ตรวจทุก 3xx capture และเก็บ Cross-domain ทุกเหตุการณ์",
-        ):
+        st.markdown('<div class="mode-button">', unsafe_allow_html=True)
+        if st.button("🔍 Full Scan", key="choose_full_scan", use_container_width=True):
             st.session_state.scan_mode = "Full Scan"
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown(
             """
-            <div class="scan-copy">
-                ตรวจทุก 3xx capture ของ Domain และเก็บหลักฐาน
-                <b>Cross-domain ทุกเหตุการณ์</b>
-                <div class="scan-note">⭐ ละเอียดที่สุด · ใช้เวลามากกว่า</div>
+            <div class="mode-copy">
+              ตรวจทุก 3xx capture ของ Domain และเก็บหลักฐาน
+              <b>Cross-domain ทุกเหตุการณ์</b>
+              <div class="mode-note">⭐ ละเอียดที่สุด · ใช้เวลามากกว่า</div>
             </div>
             """,
             unsafe_allow_html=True,
@@ -695,24 +676,23 @@ with full_col:
 
 with quick_col:
     with st.container(border=True):
-        quick_selected = st.session_state.scan_mode == "Quick Scan"
+        if st.session_state.scan_mode == "Quick Scan":
+            st.markdown('<div class="mode-selected">✓ เลือกอยู่</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="mode-unselected">○ ยังไม่ได้เลือก</div>', unsafe_allow_html=True)
 
-        if st.button(
-            "⚡ Quick Scan",
-            key="choose_quick_scan",
-            type="primary" if quick_selected else "secondary",
-            use_container_width=True,
-            help="ตรวจตัวอย่างสูงสุด 160 captures และหยุดเมื่อเจอ Cross-domain",
-        ):
+        st.markdown('<div class="mode-button">', unsafe_allow_html=True)
+        if st.button("⚡ Quick Scan", key="choose_quick_scan", use_container_width=True):
             st.session_state.scan_mode = "Quick Scan"
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown(
             """
-            <div class="scan-copy">
-                ตรวจตัวอย่างสูงสุด 160 captures โดยเน้นช่วงล่าสุด
-                และกระจายทั่ว timeline
-                <div class="scan-note">🕘 เร็วกว่า · เหมาะสำหรับเช็กเบื้องต้น</div>
+            <div class="mode-copy">
+              ตรวจตัวอย่างสูงสุด 160 captures โดยเน้นช่วงล่าสุด
+              และกระจายทั่ว timeline
+              <div class="mode-note">🕘 เร็วกว่า · เหมาะสำหรับเช็กเบื้องต้น</div>
             </div>
             """,
             unsafe_allow_html=True,
@@ -721,20 +701,9 @@ with quick_col:
 mode = st.session_state.scan_mode
 
 if mode == "Full Scan":
-    st.markdown(
-        '<div class="selected-mode">✓ Full Scan เป็นโหมดที่เลือก · แนะนำสำหรับผลละเอียด</div>',
-        unsafe_allow_html=True,
-    )
-    st.info("Full Scan จะตรวจทุก 3xx capture ที่ Wayback/CDX ส่งกลับมา")
+    st.info("Full Scan เป็นโหมดแนะนำ: ตรวจทุก 3xx capture ที่ Wayback/CDX ส่งกลับมา")
 else:
-    st.markdown(
-        '<div class="selected-mode">⚡ Quick Scan เป็นโหมดที่เลือก · ตรวจแบบเร็ว</div>',
-        unsafe_allow_html=True,
-    )
-    st.info(
-        "Quick Scan จะตรวจสูงสุด 160 captures หากไม่พบ Cross-domain "
-        "แนะนำให้ใช้ Full Scan เพื่อยืนยัน"
-    )
+    st.info("Quick Scan ตรวจสูงสุด 160 captures หากไม่พบ Cross-domain แนะนำให้ใช้ Full Scan เพื่อยืนยัน")
 
 if st.button("🚀 เริ่มตรวจสอบ", type="primary", use_container_width=True):
     domain = normalize_domain(domain_input)
