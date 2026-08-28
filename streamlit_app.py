@@ -1322,8 +1322,15 @@ if start_clicked or search_clicked:
             st.error(
                 "🌐 ไม่สามารถเชื่อมต่อ Wayback Machine ได้ชั่วคราว\n\n"
                 "Wayback Machine อาจกำลังมีผู้ใช้งานจำนวนมาก หรือการเชื่อมต่อขัดข้องชั่วคราว "
-                "กรุณารอสักครู่แล้ว **Refresh หน้าเว็บและลองตรวจสอบอีกครั้ง**"
+                "กรุณารอสักครู่แล้วลองใหม่อีกครั้ง"
             )
+
+            if st.button(
+                "🔄 Refresh และลองใหม่",
+                key="wayback_refresh_btn",
+                use_container_width=True,
+            ):
+                st.rerun()
 
         except Exception as e:
             st.error(f"เกิดข้อผิดพลาด: {e}")
