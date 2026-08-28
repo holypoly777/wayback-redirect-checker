@@ -87,7 +87,10 @@ html, body, .stApp, [class*="css"] {
 #MainMenu, footer, header [data-testid="stStatusWidget"] { visibility: hidden; }
 
 /* invisible layout markers */
-[data-testid="stElementContainer"]:has(.mk) { display: none !important; }
+[data-testid="stElementContainer"]:has(.mk),
+.element-container:has(.mk),
+.stMarkdown:has(.mk) { display: none !important; }
+.mk, .card-mark { display: none !important; }
 
 /* ---------------------------------------------------------
    Shared pieces
@@ -119,12 +122,13 @@ html, body, .stApp, [class*="css"] {
     font-weight: 800;
     color: var(--ink);
     letter-spacing: -0.02em;
-    line-height: 1.25;
+    line-height: 1.5;
 }
 
 .head-sub {
-    margin-top: 3px;
+    margin-top: 2px;
     font-size: .93rem;
+    line-height: 1.6;
     color: var(--muted);
 }
 
@@ -159,28 +163,40 @@ html, body, .stApp, [class*="css"] {
     font-weight: 800;
     letter-spacing: -0.035em;
     color: var(--ink);
-    line-height: 1.1;
+    line-height: 1.35;
 }
 
 .hero-sub {
     position: relative;
     z-index: 1;
-    margin-top: 14px;
+    margin-top: 12px;
     color: var(--ink-soft);
     font-size: 1rem;
+    line-height: 1.7;
 }
 
 /* ---------------------------------------------------------
-   Bordered container -> white card
+   Container -> white card
+   (child combinator keeps ancestor blocks from matching)
    --------------------------------------------------------- */
 
-[data-testid="stVerticalBlockBorderWrapper"]:has(.card-mark),
-.stVerticalBlockBorderWrapper:has(.card-mark) {
-    background: #ffffff;
+[data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .card-mark),
+[data-testid="stVerticalBlock"]:has(> .element-container .card-mark),
+[data-testid="stVerticalBlockBorderWrapper"]:has(.card-mark) {
+    background: #ffffff !important;
     border: 1px solid var(--line) !important;
     border-radius: var(--radius) !important;
     padding: 24px 26px 26px !important;
-    box-shadow: 0 12px 34px rgba(22, 32, 60, .05);
+    box-shadow: 0 12px 34px rgba(22, 32, 60, .05) !important;
+}
+
+/* if both wrapper and inner block matched, keep only the outer frame */
+[data-testid="stVerticalBlockBorderWrapper"]:has(.card-mark)
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .card-mark) {
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
 }
 
 /* ---------------------------------------------------------
@@ -189,45 +205,96 @@ html, body, .stApp, [class*="css"] {
 
 [data-testid="stHorizontalBlock"]:has(.q-input) {
     gap: 0 !important;
-    margin-top: 18px;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    margin-top: 20px;
+    width: 100%;
 }
 
-[data-testid="stTextInput"] input {
-    background: #ffffff;
-    border: 1.5px solid #cfd8ea;
-    border-right: none;
-    border-radius: 14px 0 0 14px;
-    color: var(--ink);
-    font-size: 1rem;
-    min-height: 58px;
-    padding-left: 18px;
-    box-shadow: none;
+[data-testid="stHorizontalBlock"]:has(.q-input) [data-testid="stColumn"] {
+    min-width: 0 !important;
+}
+
+[data-testid="stHorizontalBlock"]:has(.q-input) [data-testid="stElementContainer"],
+[data-testid="stHorizontalBlock"]:has(.q-input) .element-container,
+[data-testid="stHorizontalBlock"]:has(.q-input) [data-testid="stWidgetLabel"] {
+    margin: 0 !important;
+}
+
+/* the visible field frame lives on the wrapper, not the <input> */
+[data-testid="stTextInput"] > div,
+[data-testid="stTextInput"] [data-baseweb="input"],
+[data-testid="stTextInput"] [data-baseweb="base-input"] {
+    background: #ffffff !important;
+    border: 1.5px solid #cfd8ea !important;
+    border-right: none !important;
+    border-radius: 14px 0 0 14px !important;
+    height: 58px !important;
+    min-height: 58px !important;
+    box-shadow: none !important;
+    overflow: hidden;
     transition: border-color .16s ease, box-shadow .16s ease;
 }
 
-[data-testid="stTextInput"] input:focus {
-    border-color: var(--blue);
-    box-shadow: 0 0 0 4px rgba(29, 78, 216, .10);
+[data-testid="stTextInput"] [data-baseweb="input"],
+[data-testid="stTextInput"] [data-baseweb="base-input"] {
+    border: none !important;
+    border-radius: 0 !important;
+    height: 54px !important;
+    min-height: 54px !important;
 }
 
-[data-testid="stTextInput"] input::placeholder { color: #a3aabb; }
+[data-testid="stTextInput"] input {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: var(--ink) !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+    height: 54px !important;
+    padding: 0 18px !important;
+}
 
-[data-testid="stColumn"]:has(.q-btn) div.stButton > button {
-    width: 100%;
-    min-height: 58px;
-    border-radius: 0 14px 14px 0;
-    background: var(--blue);
-    border: 1.5px solid var(--blue);
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 1rem;
+[data-testid="stTextInput"] > div:focus-within {
+    border-color: var(--blue) !important;
+    box-shadow: 0 0 0 4px rgba(29, 78, 216, .10) !important;
+}
+
+[data-testid="stTextInput"] input::placeholder { color: #a3aabb !important; }
+
+[data-testid="stColumn"]:has(.q-btn) .stButton,
+[data-testid="stColumn"]:has(.q-btn) .stButton > button,
+[data-testid="stColumn"]:has(.q-btn) button {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 58px !important;
+    min-height: 58px !important;
+    margin: 0 !important;
+}
+
+[data-testid="stColumn"]:has(.q-btn) button {
+    border-radius: 0 14px 14px 0 !important;
+    background: var(--blue) !important;
+    border: 1.5px solid var(--blue) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+    box-shadow: none !important;
     transition: background .16s ease;
 }
 
-[data-testid="stColumn"]:has(.q-btn) div.stButton > button:hover {
-    background: var(--blue-dark);
-    border-color: var(--blue-dark);
-    color: #ffffff;
+[data-testid="stColumn"]:has(.q-btn) button p,
+[data-testid="stColumn"]:has(.q-btn) button div {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    line-height: 1.6 !important;
+}
+
+[data-testid="stColumn"]:has(.q-btn) button:hover {
+    background: var(--blue-dark) !important;
+    border-color: var(--blue-dark) !important;
 }
 
 /* ---------------------------------------------------------
@@ -270,6 +337,7 @@ html, body, .stApp, [class*="css"] {
     font-weight: 800;
     color: var(--ink);
     letter-spacing: -0.02em;
+    line-height: 1.5;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -417,6 +485,7 @@ div.stButton > button[data-testid="baseButton-primary"] {
     min-height: 64px;
     font-size: 1.08rem;
     font-weight: 800;
+    line-height: 1.6;
     letter-spacing: .01em;
     box-shadow: 0 14px 30px rgba(232, 30, 76, .26);
     transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
@@ -530,9 +599,13 @@ div[data-testid="stMetricValue"] { color: var(--ink); font-weight: 800; }
     .hero-title { font-size: 1.55rem; }
     .hero-wave { display: none; }
     .scan-card { min-height: 0; }
-    [data-testid="stHorizontalBlock"]:has(.q-input) { gap: 10px !important; }
-    [data-testid="stTextInput"] input { border-radius: 14px; border-right: 1.5px solid #cfd8ea; }
-    [data-testid="stColumn"]:has(.q-btn) div.stButton > button { border-radius: 14px; }
+    [data-testid="stHorizontalBlock"]:has(.q-input) { flex-wrap: wrap !important; gap: 10px !important; }
+    [data-testid="stTextInput"] > div,
+    [data-testid="stTextInput"] [data-baseweb="input"] {
+        border-radius: 14px !important;
+        border-right: 1.5px solid #cfd8ea !important;
+    }
+    [data-testid="stColumn"]:has(.q-btn) button { border-radius: 14px !important; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -867,7 +940,7 @@ st.markdown(
 
 # ---------- Domain card ----------
 
-with st.container(border=True):
+with st.container():
     st.markdown(
         """
         <span class="card-mark"></span>
@@ -894,7 +967,7 @@ with st.container(border=True):
 
     with q2:
         st.markdown('<span class="mk q-btn"></span>', unsafe_allow_html=True)
-        search_clicked = st.button("🔍  ตรวจสอบ", key="search_btn", use_container_width=True)
+        search_clicked = st.button("ตรวจสอบ", key="search_btn", use_container_width=True)
 
 # ---------- Scan mode ----------
 
