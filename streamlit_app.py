@@ -3,6 +3,8 @@ import html
 import io
 import re
 import time
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import urlparse, unquote
 
 import requests
@@ -727,21 +729,33 @@ div[data-testid="InputInstructions"] {
 def make_session():
     session = requests.Session()
     retry = Retry(
-        total=3,
-        connect=3,
-        read=2,
-        backoff_factor=0.45,
+        total=2,
+        connect=2,
+        read=1,
+        backoff_factor=0.25,
         status_forcelist=[429, 500, 502, 503, 504],
         allowed_methods=["GET"],
         raise_on_status=False,
     )
-    session.mount("https://", HTTPAdapter(max_retries=retry))
-    session.mount("http://", HTTPAdapter(max_retries=retry))
+    adapter = HTTPAdapter(
+        max_retries=retry,
+        pool_connections=24,
+        pool_maxsize=24,
+        pool_block=False,
+    )
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
     session.headers.update(HEADERS)
     return session
 
 
 SESSION = make_session()
+_THREAD_LOCAL = threading.local()
+
+def get_thread_session():
+    if not hasattr(_THREAD_LOCAL, "session"):
+        _THREAD_LOCAL.session = make_session()
+    return _THREAD_LOCAL.session
 
 
 # ============================================================
@@ -806,10 +820,12 @@ def inspect_capture(timestamp, original):
 
     errors = []
     last_status = ""
+    session = get_thread_session()
 
     for replay in candidates:
         try:
-            r = SESSION.get(replay, timeout=25, allow_redirects=False)
+            # Shorter timeout keeps dead/slow Wayback snapshots from blocking the scan.
+            r = session.get(replay, timeout=(3.5, 7), allow_redirects=False)
             last_status = r.status_code
 
             target = clean_location(r.headers.get("Location", ""))
@@ -943,11 +959,17 @@ def scan(domain, mode):
     full = mode == "Full Scan"
     todo = captures if full else build_quick_order(captures, max_checks=160)
 
-    results = []
-    progress = st.progress(0, text="กำลังตรวจ Wayback captures...")
+    progress = st.progress(0, text="กำลังเตรียม Wayback captures...")
     status_box = st.empty()
 
-    for i, row in enumerate(todo, 1):
+    # Conservative concurrency: much faster than sequential requests while
+    # avoiding an unnecessarily aggressive burst toward Internet Archive.
+    max_workers = 12 if full else 16
+    completed = 0
+    results_by_index = {}
+    cross_found = False
+
+    def inspect_row(index, row):
         ts = row.get("timestamp", "")
         source = row.get("original", "")
         archived_status = row.get("statuscode", "")
@@ -958,42 +980,59 @@ def scan(domain, mode):
             target, replay, error, replay_http = "", "", str(e), ""
 
         kind = classify(source, target, domain)
-
         date = f"{ts[:4]}-{ts[4:6]}-{ts[6:8]}" if len(ts) >= 8 else ts
 
-        results.append(
-            {
-                "date": date,
-                "timestamp": ts,
-                "source": source,
-                "archived_status": archived_status,
-                "replay_http_status": replay_http,
-                "target": target,
-                "classification": kind,
-                "evidence_url": evidence_url(ts, source),
-                "replay_url": replay,
-                "error": error,
-            }
-        )
+        return index, {
+            "date": date,
+            "timestamp": ts,
+            "source": source,
+            "archived_status": archived_status,
+            "replay_http_status": replay_http,
+            "target": target,
+            "classification": kind,
+            "evidence_url": evidence_url(ts, source),
+            "replay_url": replay,
+            "error": error,
+        }
 
-        progress.progress(i / len(todo), text=f"กำลังตรวจ {i:,}/{len(todo):,}")
-        mode_label = "Full Scan" if full else "Quick Scan"
-        status_box.info(
-            f"🔄 กำลังสแกน {mode_label} · "
-            f"{i:,}/{len(todo):,} captures · "
-            f"{date} · HTTP {archived_status} · {kind}"
-        )
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = {
+            executor.submit(inspect_row, index, row): index
+            for index, row in enumerate(todo)
+        }
 
-        if not full and kind == "CROSS-DOMAIN":
-            break
+        for future in as_completed(futures):
+            index, item = future.result()
+            results_by_index[index] = item
+            completed += 1
 
-        time.sleep(0.03)
+            progress.progress(
+                completed / len(todo),
+                text=f"กำลังตรวจ {completed:,}/{len(todo):,}"
+            )
+
+            mode_label = "Full Scan" if full else "Quick Scan"
+            status_box.info(
+                f"🔄 กำลังสแกน {mode_label} · "
+                f"{completed:,}/{len(todo):,} captures · "
+                f"ล่าสุด {item['date']} · HTTP {item['archived_status']} · "
+                f"{item['classification']}"
+            )
+
+            # Quick Scan still stops as soon as a cross-domain result is found.
+            if not full and item["classification"] == "CROSS-DOMAIN":
+                cross_found = True
+                for pending in futures:
+                    if not pending.done():
+                        pending.cancel()
+                break
 
     progress.empty()
     status_box.empty()
 
-    return results, len(captures)
+    results = [results_by_index[i] for i in sorted(results_by_index)]
 
+    return results, len(captures)
 
 def to_csv_bytes(rows):
     output = io.StringIO()
