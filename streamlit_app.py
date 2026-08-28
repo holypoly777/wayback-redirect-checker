@@ -1013,11 +1013,11 @@ def build_quick_order(captures, max_checks=160):
 def diagnose_wayback(domain):
     """
     Lightweight connectivity diagnostic for Streamlit Cloud -> Wayback.
-    Returns a dict with three independent checks:
-      1) web.archive.org root reachability
-      2) tiny CDX query (limit=1)
-      3) replay reachability for one capture when available
+    Uses a fresh session so the diagnostic is independent from any stale
+    connection pool used by the main scan.
     """
+    diag_session = make_session()
+
     report = {
         "root_ok": False,
         "root_detail": "",
@@ -1029,7 +1029,7 @@ def diagnose_wayback(domain):
 
     # 1) Root connectivity
     try:
-        r = SESSION.get(
+        r = diag_session.get(
             "https://web.archive.org/",
             timeout=(6, 15),
             allow_redirects=False,
@@ -1050,7 +1050,7 @@ def diagnose_wayback(domain):
 
     sample_capture = None
     try:
-        r = SESSION.get(CDX, params=params, timeout=(8, 20))
+        r = diag_session.get(CDX, params=params, timeout=(8, 20))
         r.raise_for_status()
         data = r.json()
         report["cdx_ok"] = True
@@ -1070,7 +1070,7 @@ def diagnose_wayback(domain):
         replay = f"{WAYBACK}/{ts}id_/{original}"
 
         try:
-            r = SESSION.get(
+            r = diag_session.get(
                 replay,
                 timeout=(6, 15),
                 allow_redirects=False,
@@ -1130,12 +1130,13 @@ def scan(domain, mode):
             "error": error,
         }
 
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = {
-            executor.submit(inspect_row, index, row): index
-            for index, row in enumerate(todo)
-        }
+    executor = ThreadPoolExecutor(max_workers=max_workers)
+    futures = {
+        executor.submit(inspect_row, index, row): index
+        for index, row in enumerate(todo)
+    }
 
+    try:
         for future in as_completed(futures):
             index, item = future.result()
             results_by_index[index] = item
@@ -1154,13 +1155,16 @@ def scan(domain, mode):
                 f"{item['classification']}"
             )
 
-            # Quick Scan still stops as soon as a cross-domain result is found.
+            # Quick Scan: stop as soon as a cross-domain result is found.
             if not full and item["classification"] == "CROSS-DOMAIN":
                 cross_found = True
                 for pending in futures:
                     if not pending.done():
                         pending.cancel()
                 break
+    finally:
+        # Important: do not wait for every queued Quick Scan task after a hit.
+        executor.shutdown(wait=full or not cross_found, cancel_futures=cross_found)
 
     progress.empty()
     status_box.empty()
@@ -1381,44 +1385,126 @@ if start_clicked or search_clicked:
 
     else:
         try:
-            # Auto-retry Wayback/CDX connection until it comes back.
-            # This avoids requiring the user to press F5 repeatedly.
-            retry_status = st.empty()
-            retry_attempt = 0
+            # ------------------------------------------------------------
+            # Preflight: always diagnose BEFORE the real scan.
+            # This makes failures visible instead of hiding them inside
+            # an exception path that may never be reached.
+            # ------------------------------------------------------------
+            preflight_box = st.empty()
+            preflight_box.info("🔎 กำลังตรวจสอบการเชื่อมต่อ Wayback ก่อนเริ่มสแกน...")
 
-            while True:
+            diag = diagnose_wayback(domain)
+
+            if diag["root_ok"] and diag["cdx_ok"]:
+                replay_text = (
+                    "✅" if diag["replay_ok"] is True
+                    else "⚠️" if diag["replay_ok"] is False
+                    else "—"
+                )
+                preflight_box.success(
+                    "✅ Wayback พร้อมใช้งาน · "
+                    f"Web ✅ · CDX ✅ · Replay {replay_text}"
+                )
+                time.sleep(0.35)
+                preflight_box.empty()
+
+            else:
+                # Bounded auto-retry. Do not loop forever and do not require F5.
+                recovered = False
+                max_preflight_retries = 4
+
+                for attempt in range(1, max_preflight_retries + 1):
+                    wait_seconds = min(8, attempt * 2)
+                    preflight_box.warning(
+                        "🌐 Wayback ยังไม่พร้อมใช้งาน · "
+                        f"ระบบจะลองเชื่อมต่อใหม่อัตโนมัติใน {wait_seconds} วินาที "
+                        f"({attempt}/{max_preflight_retries})"
+                    )
+                    time.sleep(wait_seconds)
+
+                    diag = diagnose_wayback(domain)
+                    if diag["root_ok"] and diag["cdx_ok"]:
+                        recovered = True
+                        preflight_box.success(
+                            "✅ เชื่อมต่อ Wayback ได้แล้ว กำลังเริ่มสแกน..."
+                        )
+                        time.sleep(0.35)
+                        preflight_box.empty()
+                        break
+
+                if not recovered:
+                    preflight_box.empty()
+                    st.error("🌐 ยังไม่สามารถเชื่อมต่อ Wayback Machine ได้")
+
+                    if not diag["root_ok"]:
+                        st.warning(
+                            "🔴 **WAYBACK BLOCKED / UNREACHABLE**\n\n"
+                            "Server ของเว็บนี้เชื่อมต่อ `web.archive.org` ไม่สำเร็จ "
+                            f"({diag['root_detail']})"
+                        )
+                    elif not diag["cdx_ok"]:
+                        st.warning(
+                            "🟠 **CDX API มีปัญหา**\n\n"
+                            "`web.archive.org` เข้าถึงได้ แต่ CDX API ที่ใช้ดึง captures "
+                            f"ตอบกลับไม่สำเร็จ ({diag['cdx_detail']})"
+                        )
+                    elif diag["replay_ok"] is False:
+                        st.warning(
+                            "🟡 **REPLAY ENDPOINT มีปัญหา**\n\n"
+                            "CDX API ใช้งานได้ แต่ snapshot/replay เชื่อมต่อไม่สำเร็จ "
+                            f"({diag['replay_detail']})"
+                        )
+
+                    with st.expander("รายละเอียด Diagnostic"):
+                        st.write({
+                            "Wayback root": diag["root_detail"],
+                            "CDX API": diag["cdx_detail"],
+                            "Replay": diag["replay_detail"] or "ไม่ได้ทดสอบ",
+                        })
+
+                    st.stop()
+
+            # ------------------------------------------------------------
+            # Real scan. Retry only a few times if the connection drops
+            # after a successful preflight.
+            # ------------------------------------------------------------
+            scan_retry_box = st.empty()
+            results = None
+            total = 0
+
+            for scan_attempt in range(1, 4):
                 try:
                     with st.spinner(f"กำลังโหลดประวัติ 3xx ของ {domain}..."):
                         results, total = scan(domain, mode)
-                    retry_status.empty()
+                    scan_retry_box.empty()
                     break
 
-                except requests.ConnectionError:
-                    retry_attempt += 1
-                    wait_seconds = min(20, 2 + (retry_attempt - 1) * 2)
-                    retry_status.warning(
-                        f"🌐 Wayback Machine ยังเชื่อมต่อไม่ได้ · "
-                        f"ระบบกำลังลองใหม่อัตโนมัติใน {wait_seconds} วินาที "
-                        f"(ครั้งที่ {retry_attempt})"
+                except (requests.ConnectionError, requests.Timeout):
+                    if scan_attempt >= 3:
+                        raise
+                    wait_seconds = scan_attempt * 3
+                    scan_retry_box.warning(
+                        "🌐 การเชื่อมต่อ Wayback สะดุดระหว่างสแกน · "
+                        f"กำลังลองใหม่ใน {wait_seconds} วินาที "
+                        f"({scan_attempt}/3)"
                     )
                     time.sleep(wait_seconds)
 
                 except requests.HTTPError as e:
                     status_code = getattr(getattr(e, "response", None), "status_code", None)
-
-                    if status_code in (429, 500, 502, 503, 504):
-                        retry_attempt += 1
-                        wait_seconds = min(20, 2 + (retry_attempt - 1) * 2)
-                        retry_status.warning(
-                            f"🌐 Wayback Machine ตอบกลับไม่พร้อมใช้งานชั่วคราว"
-                            f"{f' (HTTP {status_code})' if status_code else ''} · "
-                            f"ระบบกำลังลองใหม่อัตโนมัติใน {wait_seconds} วินาที "
-                            f"(ครั้งที่ {retry_attempt})"
+                    if status_code in (429, 500, 502, 503, 504) and scan_attempt < 3:
+                        wait_seconds = scan_attempt * 3
+                        scan_retry_box.warning(
+                            f"🌐 Wayback ตอบกลับ HTTP {status_code} · "
+                            f"กำลังลองใหม่ใน {wait_seconds} วินาที "
+                            f"({scan_attempt}/3)"
                         )
                         time.sleep(wait_seconds)
                         continue
-
                     raise
+
+            if results is None:
+                raise requests.ConnectionError("Wayback scan did not complete")
 
             if total == 0:
                 st.warning("ไม่พบ 3xx capture ใน Wayback Machine")
@@ -1501,43 +1587,34 @@ if start_clicked or search_clicked:
                     use_container_width=True,
                 )
 
-        except requests.HTTPError as e:
-            st.error(f"Wayback/CDX ตอบกลับผิดพลาด: {e}")
 
-        except requests.ConnectionError:
+        except (requests.ConnectionError, requests.Timeout):
             st.error(
-                "🌐 ไม่สามารถเชื่อมต่อ Wayback Machine ได้ในขณะนี้"
+                "🌐 การเชื่อมต่อ Wayback หลุดระหว่างการสแกน และลองใหม่อัตโนมัติแล้วไม่สำเร็จ"
             )
 
-            with st.spinner("กำลังตรวจสอบสาเหตุการเชื่อมต่อ..."):
+            with st.spinner("กำลังตรวจสอบสาเหตุล่าสุด..."):
                 diag = diagnose_wayback(domain)
 
             if not diag["root_ok"]:
                 st.warning(
                     "🔴 **WAYBACK BLOCKED / UNREACHABLE**\n\n"
-                    "Server ของเว็บนี้ไม่สามารถเชื่อมต่อ `web.archive.org` ได้โดยตรงในขณะนี้ "
-                    f"({diag['root_detail']})"
+                    f"{diag['root_detail']}"
                 )
-
             elif not diag["cdx_ok"]:
                 st.warning(
                     "🟠 **CDX API มีปัญหา**\n\n"
-                    "`web.archive.org` ยังเข้าถึงได้ แต่ CDX API ที่ใช้ดึงรายการ captures "
-                    f"ตอบกลับไม่สำเร็จ ({diag['cdx_detail']})"
+                    f"{diag['cdx_detail']}"
                 )
-
             elif diag["replay_ok"] is False:
                 st.warning(
                     "🟡 **REPLAY ENDPOINT มีปัญหา**\n\n"
-                    "CDX API ยังใช้งานได้ แต่ URL snapshot/replay ของ Wayback "
-                    f"เชื่อมต่อไม่สำเร็จ ({diag['replay_detail']})"
+                    f"{diag['replay_detail']}"
                 )
-
             else:
                 st.info(
-                    "🟢 **Wayback Connectivity ดูปกติใน Diagnostic**\n\n"
-                    "การเชื่อมต่อทดสอบผ่าน แต่ Scan ก่อนหน้าอาจสะดุดชั่วคราว "
-                    "กรุณาลองตรวจสอบอีกครั้ง"
+                    "🟢 Diagnostic ล่าสุดเชื่อมต่อได้ "
+                    "จึงมีแนวโน้มว่าเป็นการสะดุดชั่วคราวระหว่าง Scan"
                 )
 
             with st.expander("รายละเอียด Diagnostic"):
@@ -1547,8 +1624,15 @@ if start_clicked or search_clicked:
                     "Replay": diag["replay_detail"] or "ไม่ได้ทดสอบ",
                 })
 
+        except requests.HTTPError as e:
+            status_code = getattr(getattr(e, "response", None), "status_code", None)
+            st.error(
+                f"Wayback/CDX ตอบกลับผิดพลาด"
+                f"{f' (HTTP {status_code})' if status_code else ''}"
+            )
+
         except Exception as e:
-            st.error(f"เกิดข้อผิดพลาด: {e}")
+            st.error(f"เกิดข้อผิดพลาดที่ไม่คาดคิด: {type(e).__name__}: {e}")
 
 st.markdown(
     """
