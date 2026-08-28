@@ -1104,17 +1104,25 @@ with st.container():
 
     q1, q2 = st.columns([0.76, 0.24])
 
+    def _submit_domain():
+        st.session_state["enter_search_clicked"] = True
+
     with q1:
         st.markdown('<span class="mk q-input"></span>', unsafe_allow_html=True)
         domain_input = st.text_input(
             "Domain",
             placeholder="เช่น UFABET.com หรือ footballgibraltar.com",
             label_visibility="collapsed",
+            key="domain_input",
+            on_change=_submit_domain,
         )
 
     with q2:
         st.markdown('<span class="mk q-btn"></span>', unsafe_allow_html=True)
         search_clicked = st.button("ตรวจสอบ", key="search_btn", use_container_width=True)
+
+    enter_search_clicked = st.session_state.pop("enter_search_clicked", False)
+    search_clicked = search_clicked or enter_search_clicked
 
 # ---------- Scan mode ----------
 
@@ -1311,7 +1319,11 @@ if start_clicked or search_clicked:
             st.error(f"Wayback/CDX ตอบกลับผิดพลาด: {e}")
 
         except requests.ConnectionError as e:
-            st.error(f"เชื่อมต่อ Wayback ไม่สำเร็จจาก Server นี้ ({e})")
+            st.error(
+                "🌐 ไม่สามารถเชื่อมต่อ Wayback Machine ได้ชั่วคราว\n\n"
+                "Wayback Machine อาจกำลังมีผู้ใช้งานจำนวนมาก หรือการเชื่อมต่อขัดข้องชั่วคราว "
+                "กรุณารอสักครู่แล้ว **Refresh หน้าเว็บและลองตรวจสอบอีกครั้ง**"
+            )
 
         except Exception as e:
             st.error(f"เกิดข้อผิดพลาด: {e}")
