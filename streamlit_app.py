@@ -42,573 +42,272 @@ st.set_page_config(
 
 st.markdown(
     """
+
 <style>
-    /* =========================================================
-       Premium Light UI
-       Clean + subtle gradient + depth + modern UX
-       ========================================================= */
-
-    .stApp {
-        background:
-            radial-gradient(circle at 10% 0%, rgba(76, 110, 245, .10), transparent 24%),
-            radial-gradient(circle at 92% 8%, rgba(141, 96, 255, .08), transparent 22%),
-            linear-gradient(180deg, #fbfcff 0%, #f6f8fc 48%, #f4f6fa 100%);
-        color: #172033;
-    }
-
-    .block-container {
-        max-width: 1180px;
-        padding-top: 2rem;
-        padding-bottom: 3rem;
-    }
-
-    h1, h2, h3, h4 {
-        color: #172033;
-        letter-spacing: -0.025em;
-    }
-
-    p, label, .stMarkdown {
-        color: #27324a;
-    }
-
-    /* -------------------------
-       Header / Hero
-       ------------------------- */
-
-    .hero {
-        position: relative;
-        overflow: hidden;
-        padding: 26px 28px;
-        border: 1px solid rgba(205, 214, 230, .92);
-        border-radius: 20px;
-        background:
-            linear-gradient(135deg, rgba(255,255,255,.98), rgba(247,249,255,.94));
-        margin-bottom: 24px;
-        box-shadow:
-            0 18px 45px rgba(34, 49, 91, .07),
-            0 2px 8px rgba(34, 49, 91, .03);
-        backdrop-filter: blur(10px);
-    }
-
-    .hero::before {
-        content: "";
-        position: absolute;
-        width: 260px;
-        height: 260px;
-        right: -90px;
-        top: -125px;
-        border-radius: 50%;
-        background:
-            radial-gradient(circle, rgba(93, 108, 255, .20), rgba(93, 108, 255, 0) 68%);
-        pointer-events: none;
-    }
-
-    .hero::after {
-        content: "";
-        position: absolute;
-        width: 180px;
-        height: 180px;
-        left: -80px;
-        bottom: -120px;
-        border-radius: 50%;
-        background:
-            radial-gradient(circle, rgba(140, 87, 255, .10), rgba(140, 87, 255, 0) 70%);
-        pointer-events: none;
-    }
-
-    .hero-title {
-        position: relative;
-        z-index: 1;
-        font-size: 2.05rem;
-        font-weight: 850;
-        margin: 0;
-        background: linear-gradient(90deg, #22479f 0%, #4769d9 48%, #7d55d9 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .hero-sub {
-        position: relative;
-        z-index: 1;
-        margin-top: 9px;
-        color: #667085;
-        font-size: .98rem;
-    }
-
-    /* -------------------------
-       Domain input
-       ------------------------- */
-
-    [data-testid="stTextInput"] input {
-        background:
-            linear-gradient(180deg, #ffffff, #fbfcff);
-        border: 1px solid #d8dfeb;
-        border-radius: 12px;
-        color: #172033;
-        min-height: 50px;
-        box-shadow:
-            inset 0 1px 0 rgba(255,255,255,.85),
-            0 4px 12px rgba(35, 50, 90, .035);
-        transition: all .18s ease;
-    }
-
-    [data-testid="stTextInput"] input:hover {
-        border-color: #c7d1e5;
-    }
-
-    [data-testid="stTextInput"] input:focus {
-        border-color: #5570d8;
-        box-shadow:
-            0 0 0 4px rgba(85,112,216,.10),
-            0 8px 18px rgba(35, 50, 90, .05);
-        transform: translateY(-1px);
-    }
-
-    [data-testid="stTextInput"] input::placeholder {
-        color: #929bad;
-    }
-
-    /* -------------------------
-       Scan cards
-       ------------------------- */
-
-    .scan-card {
-        position: relative;
-        overflow: hidden;
-        border: 1px solid #dfe5ef;
-        background:
-            linear-gradient(155deg, rgba(255,255,255,.98), rgba(248,250,255,.94));
-        border-radius: 16px;
-        padding: 18px 19px;
-        min-height: 138px;
-        box-shadow:
-            0 8px 22px rgba(32, 45, 81, .045),
-            0 1px 2px rgba(32, 45, 81, .02);
-        transition:
-            transform .18s ease,
-            box-shadow .18s ease,
-            border-color .18s ease;
-    }
-
-    .scan-card:hover {
-        transform: translateY(-2px);
-        border-color: #cbd5e7;
-        box-shadow:
-            0 14px 28px rgba(32, 45, 81, .07),
-            0 2px 5px rgba(32, 45, 81, .03);
-    }
-
-    .scan-card::after {
-        content: "";
-        position: absolute;
-        width: 110px;
-        height: 110px;
-        right: -45px;
-        top: -42px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(82,113,215,.08), transparent 68%);
-        pointer-events: none;
-    }
-
-    .scan-card-primary {
-        border: 1.5px solid rgba(78, 105, 210, .78);
-        background:
-            linear-gradient(145deg, #ffffff 0%, #f7f9ff 58%, #f2f5ff 100%);
-        box-shadow:
-            0 12px 28px rgba(65, 91, 190, .09),
-            inset 0 1px 0 rgba(255,255,255,.95);
-    }
-
-    .scan-card-primary::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: linear-gradient(180deg, #5271d7, #745de1);
-        border-radius: 16px 0 0 16px;
-    }
-
-    .scan-card div {
-        color: #25304a !important;
-    }
-
-    .scan-card div[style*="color:#aeb7d0"] {
-        color: #5f6b80 !important;
-    }
-
-    .scan-card div[style*="color:#7f8bab"] {
-        color: #7c8699 !important;
-    }
-
-    .badge {
-        display: inline-block;
-        font-size: .72rem;
-        font-weight: 750;
-        padding: 4px 9px;
-        border-radius: 999px;
-        margin-left: 7px;
-        vertical-align: middle;
-    }
-
-    .badge-recommended {
-        background:
-            linear-gradient(90deg, #edf2ff, #f3edff);
-        color: #4058b8;
-        border: 1px solid #cfdbff;
-        box-shadow: 0 2px 6px rgba(75, 95, 180, .06);
-    }
-
-    /* -------------------------
-       Radio
-       ------------------------- */
-
-    [data-testid="stRadio"] {
-        background: transparent;
-    }
-
-    [data-testid="stRadio"] label {
-        color: #25304a !important;
-        font-weight: 550;
-    }
-
-    /* -------------------------
-       Main button
-       ------------------------- */
-
-    div.stButton > button[kind="primary"] {
-        background:
-            linear-gradient(90deg, #315bc8 0%, #4f67dc 52%, #6d5bd9 100%);
-        color: #ffffff;
-        border: none;
-        border-radius: 12px;
-        min-height: 50px;
-        font-weight: 750;
-        letter-spacing: .01em;
-        box-shadow:
-            0 10px 22px rgba(64, 82, 190, .20),
-            inset 0 1px 0 rgba(255,255,255,.25);
-        transition: all .18s ease;
-    }
-
-    div.stButton > button[kind="primary"]:hover {
-        filter: brightness(1.035);
-        transform: translateY(-1px);
-        box-shadow:
-            0 14px 28px rgba(64, 82, 190, .24),
-            inset 0 1px 0 rgba(255,255,255,.28);
-        color: #ffffff;
-    }
-
-    div.stButton > button[kind="primary"]:active {
-        transform: translateY(0px);
-    }
-
-    /* -------------------------
-       Info / Alerts
-       ------------------------- */
-
-    [data-testid="stAlert"] {
-        border-radius: 13px;
-        box-shadow: 0 5px 14px rgba(28, 40, 72, .035);
-        border-width: 1px;
-    }
-
-    /* -------------------------
-       Metric cards
-       ------------------------- */
-
-    div[data-testid="stMetric"] {
-        position: relative;
-        overflow: hidden;
-        background:
-            linear-gradient(150deg, #ffffff 0%, #fbfcff 100%);
-        border: 1px solid #e0e6ef;
-        padding: 17px;
-        border-radius: 15px;
-        box-shadow:
-            0 8px 22px rgba(32, 45, 81, .045),
-            0 1px 2px rgba(32, 45, 81, .02);
-    }
-
-    div[data-testid="stMetric"]::after {
-        content: "";
-        position: absolute;
-        width: 70px;
-        height: 70px;
-        top: -35px;
-        right: -30px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(75,105,210,.08), transparent 70%);
-        pointer-events: none;
-    }
-
-    div[data-testid="stMetricLabel"] {
-        color: #6c768a;
-        font-weight: 600;
-    }
-
-    div[data-testid="stMetricValue"] {
-        color: #172033;
-        font-weight: 800;
-    }
-
-    /* -------------------------
-       Cross-domain evidence
-       ------------------------- */
-
-    .evidence {
-        position: relative;
-        overflow: hidden;
-        border: 1px solid #efc9cf;
-        border-left: 4px solid #d94b5b;
-        border-radius: 14px;
-        padding: 19px;
-        background:
-            linear-gradient(145deg, #fffefe 0%, #fff7f8 100%);
-        margin: 13px 0;
-        box-shadow:
-            0 10px 24px rgba(140, 35, 50, .055);
-    }
-
-    .evidence::after {
-        content: "";
-        position: absolute;
-        width: 120px;
-        height: 120px;
-        right: -55px;
-        top: -55px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(217,75,91,.10), transparent 68%);
-    }
-
-    .evidence div {
-        color: #293247 !important;
-    }
-
-    .evidence div[style*="color:#ff8899"] {
-        color: #c53c4c !important;
-        font-weight: 700;
-    }
-
-    .evidence div[style*="color:#9aa6c3"] {
-        color: #747f91 !important;
-    }
-
-    /* -------------------------
-       Expanders / Table
-       ------------------------- */
-
-    [data-testid="stExpander"] {
-        background:
-            linear-gradient(180deg, rgba(255,255,255,.96), rgba(250,251,254,.96));
-        border-color: #e0e6ee;
-        border-radius: 13px;
-        box-shadow: 0 5px 14px rgba(28, 40, 72, .025);
-    }
-
-    /* -------------------------
-       Secondary buttons
-       ------------------------- */
-
-    [data-testid="stDownloadButton"] button,
-    [data-testid="stLinkButton"] a {
-        border-radius: 11px !important;
-        background:
-            linear-gradient(180deg, #ffffff, #f8faff) !important;
-        color: #26334d !important;
-        border: 1px solid #d7deea !important;
-        box-shadow: 0 4px 10px rgba(31, 46, 84, .035);
-        transition: all .16s ease;
-    }
-
-    [data-testid="stDownloadButton"] button:hover,
-    [data-testid="stLinkButton"] a:hover {
-        border-color: #bbc7df !important;
-        transform: translateY(-1px);
-        box-shadow: 0 8px 16px rgba(31, 46, 84, .055);
-    }
-
-    /* -------------------------
-       Footer
-       ------------------------- */
-
-    .footer-note {
-        color: #8a94a6;
-        text-align: center;
-        font-size: .82rem;
-        margin-top: 30px;
-        padding-top: 8px;
-    }
-
-    hr {
-        border-color: #e7ebf2;
-    }
-    
-    /* =========================================================
-       UX IMPROVEMENTS
-       ========================================================= */
-
-    /* All Streamlit button text */
-    div.stButton > button p {
-        font-weight: 750 !important;
-        margin: 0 !important;
-    }
-
-    /* Primary action must always be readable */
-    div.stButton > button[kind="primary"],
-    div.stButton > button[kind="primary"] *,
-    div.stButton > button[kind="primary"] p,
-    div.stButton > button[kind="primary"] span {
-        color: #ffffff !important;
-        -webkit-text-fill-color: #ffffff !important;
-    }
-
-    /* Mode selection buttons */
-    .mode-title {
-        margin-top: 6px;
-        margin-bottom: 10px;
-        font-size: 1.03rem;
-        font-weight: 800;
-        color: #1c2740;
-    }
-
-    .mode-help {
-        min-height: 60px;
-        margin-top: 9px;
-        padding: 0 4px 2px 4px;
-        color: #6a7488;
-        font-size: .88rem;
-        line-height: 1.55;
-    }
-
-    /* Make mode buttons feel like cards */
-    div[data-testid="stHorizontalBlock"] div.stButton > button {
-        min-height: 64px;
-        border-radius: 14px;
-        font-size: 1rem;
-        transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
-    }
-
-    div[data-testid="stHorizontalBlock"] div.stButton > button:hover {
-        transform: translateY(-2px);
-    }
-
-    /* Secondary card/button */
-    div.stButton > button[kind="secondary"] {
-        background: linear-gradient(145deg, #ffffff, #f8faff);
-        border: 1px solid #d7deeb;
-        color: #26334d;
-        box-shadow: 0 7px 18px rgba(35, 49, 85, .05);
-    }
-
-    div.stButton > button[kind="secondary"]:hover {
-        border-color: #aebbd5;
-        background: linear-gradient(145deg, #ffffff, #f4f7ff);
-        color: #1e2d4c;
-        box-shadow: 0 11px 24px rgba(35, 49, 85, .08);
-    }
-
-    /* Selected mode status pill */
-    .selected-mode {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        margin: 4px 0 14px 0;
-        padding: 7px 11px;
-        border-radius: 999px;
-        background: linear-gradient(90deg, #eef3ff, #f3efff);
-        border: 1px solid #d8e0fb;
-        color: #40538f;
-        font-size: .83rem;
-        font-weight: 700;
-    }
-
-    /* Start button gets stronger affordance */
-    div.stButton > button[kind="primary"] {
-        font-size: 1rem !important;
-        text-shadow: 0 1px 1px rgba(0,0,0,.08);
-    }
-
-
-    /* =========================================================
-       DOMAIN INPUT CARD — restored premium style
-       ========================================================= */
-    .domain-section {
-        position: relative;
-        overflow: hidden;
-        margin: 10px 0 22px 0;
-        padding: 20px 22px 18px 22px;
-        border: 1px solid #dce3ee;
-        border-radius: 16px;
-        background:
-            linear-gradient(145deg, rgba(255,255,255,.98), rgba(248,250,255,.96));
-        box-shadow:
-            0 10px 28px rgba(32,45,81,.055),
-            0 1px 2px rgba(32,45,81,.02);
-    }
-
-    .domain-section::after {
-        content: "";
-        position: absolute;
-        width: 150px;
-        height: 150px;
-        right: -65px;
-        top: -75px;
-        border-radius: 50%;
-        background:
-            radial-gradient(circle, rgba(86,112,216,.12), transparent 68%);
-        pointer-events: none;
-    }
-
-    .domain-heading {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        margin-bottom: 4px;
-        color: #1d2942;
-        font-size: 1.15rem;
-        font-weight: 800;
-        letter-spacing: -.015em;
-    }
-
-    .domain-sub {
-        position: relative;
-        z-index: 1;
-        margin-bottom: 13px;
-        color: #7a8497;
-        font-size: .86rem;
-        line-height: 1.5;
-    }
-
-    /* Input inside premium domain block */
-    [data-testid="stTextInput"] {
-        margin-top: -4px;
-        margin-bottom: 0;
-    }
-
-    [data-testid="stTextInput"] input {
-        background: #ffffff;
-        border: 1px solid #cfd8e7;
-        border-radius: 11px;
-        color: #172033;
-        min-height: 50px;
-        box-shadow:
-            inset 0 1px 0 rgba(255,255,255,.9),
-            0 4px 12px rgba(35,50,90,.035);
-    }
-
-    [data-testid="stTextInput"] input:focus {
-        border-color: #5570d8;
-        box-shadow:
-            0 0 0 4px rgba(85,112,216,.10),
-            0 8px 18px rgba(35,50,90,.05);
-    }
-
+:root {
+    --bg: #f6f8fc;
+    --surface: #ffffff;
+    --text: #182033;
+    --muted: #667085;
+    --line: #dde3ee;
+    --blue: #2f5bd3;
+    --blue2: #466ee8;
+    --red: #ff4d57;
+    --red2: #f32655;
+    --amber: #f3a51f;
+}
+
+.stApp {
+    background:
+        radial-gradient(circle at 92% 4%, rgba(74,110,232,.10), transparent 22%),
+        radial-gradient(circle at 7% 0%, rgba(120,93,220,.07), transparent 20%),
+        linear-gradient(180deg, #fbfcff 0%, #f6f8fc 52%, #f4f6fa 100%);
+    color: var(--text);
+}
+
+.block-container {
+    max-width: 1180px;
+    padding-top: 1.8rem;
+    padding-bottom: 3rem;
+}
+
+h1,h2,h3,h4 {
+    color: var(--text);
+    letter-spacing: -.025em;
+}
+
+/* HERO */
+.hero {
+    position: relative;
+    overflow: hidden;
+    padding: 26px 28px;
+    border: 1px solid #dfe5ef;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(255,255,255,.99), rgba(247,249,255,.97));
+    box-shadow: 0 18px 45px rgba(33,48,90,.07);
+    margin-bottom: 26px;
+}
+.hero::after {
+    content:"";
+    position:absolute;
+    width:320px;
+    height:220px;
+    right:-100px;
+    top:-120px;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(70,110,232,.17), transparent 68%);
+}
+.hero-title {
+    position: relative;
+    z-index: 1;
+    font-size: 2rem;
+    font-weight: 850;
+    background: linear-gradient(90deg,#20439b,#466ee8,#7658d8);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+.hero-sub {
+    position: relative;
+    z-index: 1;
+    margin-top: 8px;
+    color:#68748a;
+}
+
+/* DOMAIN */
+.domain-shell {
+    padding: 21px 22px 16px;
+    border: 1px solid #dde4ef;
+    border-radius: 17px;
+    background: rgba(255,255,255,.94);
+    box-shadow: 0 10px 26px rgba(33,48,90,.045);
+    margin-bottom: 22px;
+}
+.domain-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color:#1c2740;
+}
+.domain-desc {
+    color:#7a8496;
+    font-size:.87rem;
+    margin:5px 0 13px;
+}
+
+[data-testid="stTextInput"] input {
+    background:#fff;
+    color:#172033;
+    min-height:50px;
+    border:1px solid #cfd7e5;
+    border-radius:11px;
+    box-shadow:0 4px 12px rgba(35,50,90,.03);
+}
+[data-testid="stTextInput"] input:focus {
+    border-color:#3f69df;
+    box-shadow:0 0 0 4px rgba(63,105,223,.10);
+}
+
+/* MODE HEADING */
+.mode-heading {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin: 4px 0 13px;
+}
+.mode-icon {
+    width:38px;height:38px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:10px;
+    background:linear-gradient(145deg,#fff0f2,#ffe4e8);
+    color:#ef4052;
+    font-size:1.05rem;
+}
+.mode-title {
+    font-weight:850;
+    font-size:1.22rem;
+    color:#1b263d;
+}
+.mode-sub {
+    color:#798396;
+    font-size:.84rem;
+}
+
+/* STREAMLIT BORDERED CONTAINERS USED AS SCAN CARDS */
+[data-testid="stVerticalBlockBorderWrapper"] {
+    border-radius:16px !important;
+    background:linear-gradient(145deg,#ffffff,#fbfcff) !important;
+    border:1px solid #dfe5ee !important;
+    box-shadow:0 9px 24px rgba(34,47,80,.045) !important;
+    transition:transform .16s ease, box-shadow .16s ease;
+}
+[data-testid="stVerticalBlockBorderWrapper"]:hover {
+    transform:translateY(-2px);
+    box-shadow:0 14px 30px rgba(34,47,80,.07) !important;
+}
+
+/* MODE BUTTONS */
+div.stButton > button {
+    border-radius:12px;
+    min-height:50px;
+    font-weight:800;
+    transition:all .16s ease;
+}
+div.stButton > button[kind="secondary"] {
+    background:linear-gradient(180deg,#ffffff,#f8faff);
+    color:#26334d !important;
+    border:1px solid #d4dce9;
+    box-shadow:0 5px 13px rgba(35,49,85,.035);
+}
+div.stButton > button[kind="secondary"]:hover {
+    border-color:#b9c5da;
+    transform:translateY(-1px);
+}
+
+/* Selected scan mode + main CTA both use primary.
+   High contrast is forced here. */
+div.stButton > button[kind="primary"] {
+    background:linear-gradient(90deg,#ff4d57 0%,#f32655 100%);
+    border:none !important;
+    color:#fff !important;
+    box-shadow:0 10px 22px rgba(243,38,85,.18);
+}
+div.stButton > button[kind="primary"] *,
+div.stButton > button[kind="primary"] p,
+div.stButton > button[kind="primary"] span {
+    color:#fff !important;
+    -webkit-text-fill-color:#fff !important;
+}
+div.stButton > button[kind="primary"]:hover {
+    filter:brightness(1.035);
+    transform:translateY(-1px);
+    box-shadow:0 14px 27px rgba(243,38,85,.22);
+}
+
+.scan-copy {
+    padding: 2px 4px 5px;
+    color:#516076;
+    line-height:1.65;
+    font-size:.92rem;
+}
+.scan-copy b {
+    color:#29364d;
+}
+.scan-note {
+    color:#858fa1;
+    font-size:.82rem;
+    margin-top:5px;
+}
+.recommend-badge {
+    display:inline-block;
+    padding:3px 8px;
+    margin-left:5px;
+    border-radius:999px;
+    background:#ffe7ea;
+    border:1px solid #ffd0d5;
+    color:#e3384a;
+    font-size:.72rem;
+    font-weight:800;
+}
+
+/* SELECTED STATUS */
+.selected-mode {
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:7px 11px;
+    margin:10px 0 12px;
+    border-radius:999px;
+    background:linear-gradient(90deg,#fff0f2,#fff6f7);
+    border:1px solid #ffd4d9;
+    color:#d93b4c;
+    font-size:.83rem;
+    font-weight:800;
+}
+
+/* INFO / METRIC / RESULTS */
+[data-testid="stAlert"] {
+    border-radius:12px;
+}
+div[data-testid="stMetric"] {
+    background:linear-gradient(145deg,#fff,#fbfcff);
+    border:1px solid #e0e6ef;
+    border-radius:14px;
+    padding:16px;
+    box-shadow:0 8px 20px rgba(32,45,81,.04);
+}
+div[data-testid="stMetricLabel"] { color:#6c768a; }
+div[data-testid="stMetricValue"] { color:#172033; font-weight:800; }
+
+.evidence {
+    border:1px solid #efc8ce;
+    border-left:4px solid #dd4858;
+    border-radius:14px;
+    padding:18px;
+    background:linear-gradient(145deg,#fff,#fff6f7);
+    margin:12px 0;
+    box-shadow:0 10px 24px rgba(140,35,50,.05);
+}
+.evidence div { color:#293247 !important; }
+.evidence div[style*="color:#ff8899"] { color:#c53c4c !important; }
+.evidence div[style*="color:#9aa6c3"] { color:#747f91 !important; }
+
+[data-testid="stExpander"] {
+    background:#fff;
+    border-color:#e0e6ee;
+    border-radius:12px;
+}
+[data-testid="stDownloadButton"] button,
+[data-testid="stLinkButton"] a {
+    border-radius:10px !important;
+}
+
+.footer-note {
+    color:#8a94a6;
+    text-align:center;
+    font-size:.82rem;
+    margin-top:28px;
+}
 </style>
+
     """,
     unsafe_allow_html=True,
 )
@@ -936,94 +635,108 @@ st.markdown(
 
 st.markdown(
     """
-    <div class="domain-section">
-        <div class="domain-heading">🌐 ตรวจสอบ Domain</div>
-        <div class="domain-sub">
-            ใส่ชื่อโดเมนที่ต้องการตรวจ เช่น idea.me หรือ footballgibraltar.com
-        </div>
+    <div class="domain-shell">
+        <div class="domain-title">🌐 ตรวจสอบ Domain</div>
+        <div class="domain-desc">กรอกชื่อ Domain ที่ต้องการตรวจสอบ เช่น idea.me หรือ footballgibraltar.com</div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-# วางช่องกรอกต่อจากการ์ด โดยคง logic เดิมทั้งหมด
 domain_input = st.text_input(
     "Domain",
     placeholder="เช่น idea.me หรือ footballgibraltar.com",
     label_visibility="collapsed",
 )
 
-st.markdown("#### เลือกโหมดการสแกน")
+st.markdown(
+    """
+    <div class="mode-heading">
+        <div class="mode-icon">🎯</div>
+        <div>
+            <div class="mode-title">เลือกโหมดการสแกน</div>
+            <div class="mode-sub">เลือกโหมดที่เหมาะกับความต้องการของคุณ</div>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
-# เก็บโหมดที่เลือกไว้ใน session เพื่อให้กดการ์ดด้านบนได้โดยตรง
+# เก็บโหมดที่เลือกไว้ใน session
 if "scan_mode" not in st.session_state:
     st.session_state.scan_mode = "Full Scan"
 
-mode_col1, mode_col2 = st.columns(2)
+full_col, quick_col = st.columns(2, gap="medium")
 
-with mode_col1:
-    full_selected = st.session_state.scan_mode == "Full Scan"
-    if st.button(
-        "🔍 Full Scan  ·  แนะนำ",
-        key="choose_full_scan",
-        type="primary" if full_selected else "secondary",
-        use_container_width=True,
-        help="ตรวจทุก 3xx capture และเก็บ Cross-domain ทุกเหตุการณ์",
-    ):
-        st.session_state.scan_mode = "Full Scan"
-        st.rerun()
+with full_col:
+    with st.container(border=True):
+        full_selected = st.session_state.scan_mode == "Full Scan"
 
-    st.markdown(
-        """
-        <div class="mode-help">
-        ตรวจทุก 3xx capture ของ Domain และเก็บหลักฐาน Cross-domain ทุกเหตุการณ์<br>
-        <b>เหมาะเมื่ออยากได้ผลละเอียดที่สุด</b> แต่ใช้เวลามากกว่า
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+        if st.button(
+            "🔍 Full Scan  ·  แนะนำ",
+            key="choose_full_scan",
+            type="primary" if full_selected else "secondary",
+            use_container_width=True,
+            help="ตรวจทุก 3xx capture และเก็บ Cross-domain ทุกเหตุการณ์",
+        ):
+            st.session_state.scan_mode = "Full Scan"
+            st.rerun()
 
-with mode_col2:
-    quick_selected = st.session_state.scan_mode == "Quick Scan"
-    if st.button(
-        "⚡ Quick Scan",
-        key="choose_quick_scan",
-        type="primary" if quick_selected else "secondary",
-        use_container_width=True,
-        help="ตรวจตัวอย่างสูงสุด 160 captures และหยุดทันทีเมื่อเจอ Cross-domain",
-    ):
-        st.session_state.scan_mode = "Quick Scan"
-        st.rerun()
+        st.markdown(
+            """
+            <div class="scan-copy">
+                ตรวจทุก 3xx capture ของ Domain และเก็บหลักฐาน
+                <b>Cross-domain ทุกเหตุการณ์</b>
+                <div class="scan-note">⭐ ละเอียดที่สุด · ใช้เวลามากกว่า</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-    st.markdown(
-        """
-        <div class="mode-help">
-        ตรวจตัวอย่างสูงสุด 160 captures โดยเน้นช่วงล่าสุดและกระจายทั่ว timeline<br>
-        <b>เหมาะสำหรับเช็กเบื้องต้น</b> และหยุดทันทีเมื่อเจอ Cross-domain
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+with quick_col:
+    with st.container(border=True):
+        quick_selected = st.session_state.scan_mode == "Quick Scan"
+
+        if st.button(
+            "⚡ Quick Scan",
+            key="choose_quick_scan",
+            type="primary" if quick_selected else "secondary",
+            use_container_width=True,
+            help="ตรวจตัวอย่างสูงสุด 160 captures และหยุดเมื่อเจอ Cross-domain",
+        ):
+            st.session_state.scan_mode = "Quick Scan"
+            st.rerun()
+
+        st.markdown(
+            """
+            <div class="scan-copy">
+                ตรวจตัวอย่างสูงสุด 160 captures โดยเน้นช่วงล่าสุด
+                และกระจายทั่ว timeline
+                <div class="scan-note">🕘 เร็วกว่า · เหมาะสำหรับเช็กเบื้องต้น</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 mode = st.session_state.scan_mode
 
 if mode == "Full Scan":
     st.markdown(
-        '<div class="selected-mode">✓ เลือก Full Scan · โหมดแนะนำ</div>',
+        '<div class="selected-mode">✓ Full Scan เป็นโหมดที่เลือก · แนะนำสำหรับผลละเอียด</div>',
         unsafe_allow_html=True,
     )
-    st.info("จะตรวจทุก 3xx capture ที่ Wayback/CDX ส่งกลับมา เพื่อความละเอียดสูงสุด")
+    st.info("Full Scan จะตรวจทุก 3xx capture ที่ Wayback/CDX ส่งกลับมา")
 else:
     st.markdown(
-        '<div class="selected-mode">⚡ เลือก Quick Scan · ตรวจแบบเร็ว</div>',
+        '<div class="selected-mode">⚡ Quick Scan เป็นโหมดที่เลือก · ตรวจแบบเร็ว</div>',
         unsafe_allow_html=True,
     )
     st.info(
-        "จะตรวจสูงสุด 160 captures เพื่อเช็กเบื้องต้น "
-        "หากไม่พบ Cross-domain แนะนำให้ใช้ Full Scan เพื่อยืนยัน"
+        "Quick Scan จะตรวจสูงสุด 160 captures หากไม่พบ Cross-domain "
+        "แนะนำให้ใช้ Full Scan เพื่อยืนยัน"
     )
 
-if st.button("เริ่มตรวจสอบ Domain", type="primary", use_container_width=True):
+if st.button("🚀 เริ่มตรวจสอบ", type="primary", use_container_width=True):
     domain = normalize_domain(domain_input)
 
     if not domain or "." not in domain:
