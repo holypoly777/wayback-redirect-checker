@@ -445,7 +445,106 @@ st.markdown(
     hr {
         border-color: #e7ebf2;
     }
-    </style>
+    
+    /* =========================================================
+       Clickable scan mode cards
+       - move Full/Quick controls into the cards
+       - remove separate radio row
+       - no hover animation
+       ========================================================= */
+
+    .scan-mode-card div[data-testid="stVerticalBlockBorderWrapper"] {
+        border-radius: 16px !important;
+        background: linear-gradient(155deg, rgba(255,255,255,.98), rgba(248,250,255,.94)) !important;
+        border: 1px solid #dfe5ef !important;
+        box-shadow:
+            0 8px 22px rgba(32,45,81,.045),
+            0 1px 2px rgba(32,45,81,.02) !important;
+        transition: none !important;
+    }
+
+    .scan-mode-card div[data-testid="stVerticalBlockBorderWrapper"]:hover {
+        transform: none !important;
+        border-color: #dfe5ef !important;
+        box-shadow:
+            0 8px 22px rgba(32,45,81,.045),
+            0 1px 2px rgba(32,45,81,.02) !important;
+    }
+
+    .scan-mode-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #25304a;
+        margin-bottom: 7px;
+    }
+
+    .scan-mode-desc {
+        color: #5f6b80;
+        line-height: 1.6;
+        font-size: .92rem;
+        min-height: 64px;
+    }
+
+    .scan-mode-meta {
+        margin-top: 8px;
+        color: #7c8699;
+        font-size: .84rem;
+    }
+
+    .scan-mode-selected {
+        display: inline-block;
+        font-size: .72rem;
+        font-weight: 800;
+        padding: 4px 9px;
+        border-radius: 999px;
+        margin-left: 7px;
+        background: linear-gradient(90deg, #edf2ff, #f3edff);
+        color: #4058b8;
+        border: 1px solid #cfdbff;
+    }
+
+    /* selector button inside each card */
+    .scan-mode-card div.stButton > button {
+        margin-top: 8px;
+        min-height: 42px !important;
+        border-radius: 10px !important;
+        font-weight: 800 !important;
+        transition: none !important;
+        box-shadow: none !important;
+    }
+
+    .scan-mode-card div.stButton > button:hover {
+        transform: none !important;
+        filter: none !important;
+    }
+
+    .scan-mode-card div.stButton > button[kind="secondary"] {
+        background: #ffffff !important;
+        color: #25304a !important;
+        border: 1px solid #d7deea !important;
+    }
+
+    .scan-mode-card div.stButton > button[kind="secondary"] *,
+    .scan-mode-card div.stButton > button[kind="secondary"] p,
+    .scan-mode-card div.stButton > button[kind="secondary"] span {
+        color: #25304a !important;
+        -webkit-text-fill-color: #25304a !important;
+    }
+
+    .scan-mode-card div.stButton > button[kind="primary"] {
+        background: linear-gradient(90deg, #315bc8 0%, #4f67dc 52%, #6d5bd9 100%) !important;
+        color: #ffffff !important;
+        border: none !important;
+    }
+
+    .scan-mode-card div.stButton > button[kind="primary"] *,
+    .scan-mode-card div.stButton > button[kind="primary"] p,
+    .scan-mode-card div.stButton > button[kind="primary"] span {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }
+
+</style>
     """,
     unsafe_allow_html=True,
 )
@@ -781,49 +880,65 @@ domain_input = st.text_input(
 
 st.markdown("#### เลือกโหมดการสแกน")
 
-c1, c2 = st.columns(2)
+if "scan_mode" not in st.session_state:
+    st.session_state.scan_mode = "Full Scan"
+
+c1, c2 = st.columns(2, gap="medium")
 
 with c1:
-    st.markdown(
-        """
-        <div class="scan-card scan-card-primary">
-          <div style="font-size:1.05rem;font-weight:800;">
-            🔍 Full Scan <span class="badge badge-recommended">แนะนำ</span>
-          </div>
-          <div style="margin-top:8px;color:#aeb7d0;">
-            ตรวจทุก 3xx capture ของ Domain และเก็บ Cross-domain ทุกเหตุการณ์
-          </div>
-          <div style="margin-top:8px;color:#7f8bab;font-size:.88rem;">
-            แม่นยำที่สุด · ใช้เวลามากกว่า
-          </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.markdown('<div class="scan-mode-card">', unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown(
+            """
+            <div class="scan-mode-title">
+                🔍 Full Scan
+                <span class="scan-mode-selected">แนะนำ</span>
+            </div>
+            <div class="scan-mode-desc">
+                ตรวจทุก 3xx capture ของ Domain และเก็บ Cross-domain ทุกเหตุการณ์
+                <div class="scan-mode-meta">แม่นยำที่สุด · ใช้เวลามากกว่า</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        full_selected = st.session_state.scan_mode == "Full Scan"
+        if st.button(
+            "✓ Full Scan" if full_selected else "เลือก Full Scan",
+            key="select_full_scan",
+            type="primary" if full_selected else "secondary",
+            use_container_width=True,
+        ):
+            st.session_state.scan_mode = "Full Scan"
+            st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with c2:
-    st.markdown(
-        """
-        <div class="scan-card">
-          <div style="font-size:1.05rem;font-weight:800;">⚡ Quick Scan</div>
-          <div style="margin-top:8px;color:#aeb7d0;">
-            ตรวจตัวอย่างสูงสุด 160 captures โดยเน้นช่วงล่าสุดและกระจายทั่ว timeline
-          </div>
-          <div style="margin-top:8px;color:#7f8bab;font-size:.88rem;">
-            เร็วกว่า · เจอ Cross-domain แล้วหยุดทันที
-          </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.markdown('<div class="scan-mode-card">', unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown(
+            """
+            <div class="scan-mode-title">⚡ Quick Scan</div>
+            <div class="scan-mode-desc">
+                ตรวจตัวอย่างสูงสุด 160 captures โดยเน้นช่วงล่าสุดและกระจายทั่ว timeline
+                <div class="scan-mode-meta">เร็วกว่า · เจอ Cross-domain แล้วหยุดทันที</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-mode = st.radio(
-    "โหมด",
-    ["Full Scan", "Quick Scan"],
-    horizontal=True,
-    index=0,
-    label_visibility="collapsed",
-)
+        quick_selected = st.session_state.scan_mode == "Quick Scan"
+        if st.button(
+            "✓ Quick Scan" if quick_selected else "เลือก Quick Scan",
+            key="select_quick_scan",
+            type="primary" if quick_selected else "secondary",
+            use_container_width=True,
+        ):
+            st.session_state.scan_mode = "Quick Scan"
+            st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+mode = st.session_state.scan_mode
 
 if mode == "Full Scan":
     st.info("Full Scan เป็นโหมดแนะนำ: ตรวจทุก 3xx capture ที่ Wayback/CDX ส่งกลับมา")
