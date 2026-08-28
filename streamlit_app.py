@@ -447,49 +447,62 @@ st.markdown(
     }
     
     /* =========================================================
-       ONLY CHANGE: tiny selector visually inside ORIGINAL cards.
-       Card border/design remains exactly from streamlit_app(2).py.
+       Scan mode cards
+       Selector is physically INSIDE each bordered card.
+       No hover movement/effect.
        ========================================================= */
 
-    /* User requested no hover movement on these two scan cards */
-    .scan-card,
-    .scan-card:hover {
-        transform: none !important;
+    .scan-mode-box div[data-testid="stVerticalBlockBorderWrapper"] {
+        border: 1px solid #dfe5ef !important;
+        border-radius: 16px !important;
+        background: linear-gradient(155deg, rgba(255,255,255,.98), rgba(248,250,255,.94)) !important;
+        box-shadow:
+            0 8px 22px rgba(32,45,81,.045),
+            0 1px 2px rgba(32,45,81,.02) !important;
+        transition: none !important;
+        overflow: hidden !important;
     }
 
-    .scan-card:hover {
-        border-color: #dfe5ef !important;
+    .scan-mode-box.selected div[data-testid="stVerticalBlockBorderWrapper"] {
+        border: 1.5px solid rgba(78,105,210,.78) !important;
+        background: linear-gradient(145deg, #ffffff 0%, #f7f9ff 58%, #f2f5ff 100%) !important;
         box-shadow:
-            0 8px 22px rgba(32, 45, 81, .045),
-            0 1px 2px rgba(32, 45, 81, .02) !important;
-    }
-
-    .scan-card-primary:hover {
-        border: 1.5px solid rgba(78, 105, 210, .78) !important;
-        box-shadow:
-            0 12px 28px rgba(65, 91, 190, .09),
+            0 12px 28px rgba(65,91,190,.09),
             inset 0 1px 0 rgba(255,255,255,.95) !important;
     }
 
-    /* Overlay host: no border/background of its own */
-    .scan-choice-host {
-        position: relative;
-        margin-top: -138px;
-        height: 138px;
-        pointer-events: none;
-        z-index: 10;
+    .scan-mode-box div[data-testid="stVerticalBlockBorderWrapper"]:hover,
+    .scan-mode-box.selected div[data-testid="stVerticalBlockBorderWrapper"]:hover {
+        transform: none !important;
+        filter: none !important;
     }
 
-    .scan-choice-host div.stButton {
-        pointer-events: auto;
-        position: absolute;
-        top: 15px;
-        right: 16px;
-        width: 24px !important;
-        height: 24px !important;
+    .scan-mode-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #25304a;
     }
 
-    .scan-choice-host div.stButton > button {
+    .scan-mode-desc {
+        margin-top: 8px;
+        color: #5f6b80;
+        font-size: .92rem;
+        line-height: 1.55;
+    }
+
+    .scan-mode-meta {
+        margin-top: 8px;
+        color: #7c8699;
+        font-size: .88rem;
+    }
+
+    /* Small radio/check icon INSIDE card */
+    .scan-radio-inside div.stButton {
+        display: flex !important;
+        justify-content: flex-end !important;
+    }
+
+    .scan-radio-inside div.stButton > button {
         width: 24px !important;
         min-width: 24px !important;
         height: 24px !important;
@@ -503,23 +516,22 @@ st.markdown(
         line-height: 1 !important;
     }
 
-    .scan-choice-host div.stButton > button:hover,
-    .scan-choice-host div.stButton > button:focus,
-    .scan-choice-host div.stButton > button:active {
+    .scan-radio-inside div.stButton > button:hover,
+    .scan-radio-inside div.stButton > button:focus,
+    .scan-radio-inside div.stButton > button:active {
         transform: none !important;
         filter: none !important;
         box-shadow: none !important;
     }
 
-    /* selected */
-    .scan-choice-host div.stButton > button[kind="primary"] {
+    .scan-radio-inside div.stButton > button[kind="primary"] {
         position: relative !important;
         background: #ff4d57 !important;
         border: 1px solid #ff4d57 !important;
         color: transparent !important;
     }
 
-    .scan-choice-host div.stButton > button[kind="primary"]::after {
+    .scan-radio-inside div.stButton > button[kind="primary"]::after {
         content: "✓";
         position: absolute;
         inset: 0;
@@ -531,15 +543,14 @@ st.markdown(
         font-weight: 900;
     }
 
-    /* unselected */
-    .scan-choice-host div.stButton > button[kind="secondary"] {
+    .scan-radio-inside div.stButton > button[kind="secondary"] {
         background: #ffffff !important;
         border: 2px solid #d6deeb !important;
         color: transparent !important;
     }
 
-    .scan-choice-host div.stButton > button p,
-    .scan-choice-host div.stButton > button span {
+    .scan-radio-inside div.stButton > button p,
+    .scan-radio-inside div.stButton > button span {
         font-size: 0 !important;
         color: transparent !important;
         -webkit-text-fill-color: transparent !important;
@@ -887,61 +898,85 @@ if "scan_mode" not in st.session_state:
 c1, c2 = st.columns(2)
 
 with c1:
+    full_selected = st.session_state.scan_mode == "Full Scan"
+
     st.markdown(
-        """
-        <div class="scan-card scan-card-primary">
-          <div style="font-size:1.05rem;font-weight:800;">
-            🔍 Full Scan <span class="badge badge-recommended">แนะนำ</span>
-          </div>
-          <div style="margin-top:8px;color:#aeb7d0;">
-            ตรวจทุก 3xx capture ของ Domain และเก็บ Cross-domain ทุกเหตุการณ์
-          </div>
-          <div style="margin-top:8px;color:#7f8bab;font-size:.88rem;">
-            แม่นยำที่สุด · ใช้เวลามากกว่า
-          </div>
-        </div>
-        """,
+        f'<div class="scan-mode-box {"selected" if full_selected else ""}">',
         unsafe_allow_html=True,
     )
 
-    full_selected = st.session_state.scan_mode == "Full Scan"
-    st.markdown('<div class="scan-choice-host">', unsafe_allow_html=True)
-    if st.button(
-        " ",
-        key="scan_full_circle",
-        type="primary" if full_selected else "secondary",
-        help="เลือก Full Scan",
-    ):
-        st.session_state.scan_mode = "Full Scan"
-        st.rerun()
+    with st.container(border=True):
+        text_col, select_col = st.columns([9, 1], vertical_alignment="top")
+
+        with text_col:
+            st.markdown(
+                """
+                <div class="scan-mode-title">
+                    🔍 Full Scan <span class="badge badge-recommended">แนะนำ</span>
+                </div>
+                <div class="scan-mode-desc">
+                    ตรวจทุก 3xx capture ของ Domain และเก็บ Cross-domain ทุกเหตุการณ์
+                </div>
+                <div class="scan-mode-meta">
+                    แม่นยำที่สุด · ใช้เวลามากกว่า
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with select_col:
+            st.markdown('<div class="scan-radio-inside">', unsafe_allow_html=True)
+            if st.button(
+                " ",
+                key="scan_full_inside",
+                type="primary" if full_selected else "secondary",
+                help="เลือก Full Scan",
+            ):
+                st.session_state.scan_mode = "Full Scan"
+                st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
+
     st.markdown("</div>", unsafe_allow_html=True)
 
 with c2:
+    quick_selected = st.session_state.scan_mode == "Quick Scan"
+
     st.markdown(
-        """
-        <div class="scan-card">
-          <div style="font-size:1.05rem;font-weight:800;">⚡ Quick Scan</div>
-          <div style="margin-top:8px;color:#aeb7d0;">
-            ตรวจตัวอย่างสูงสุด 160 captures โดยเน้นช่วงล่าสุดและกระจายทั่ว timeline
-          </div>
-          <div style="margin-top:8px;color:#7f8bab;font-size:.88rem;">
-            เร็วกว่า · เจอ Cross-domain แล้วหยุดทันที
-          </div>
-        </div>
-        """,
+        f'<div class="scan-mode-box {"selected" if quick_selected else ""}">',
         unsafe_allow_html=True,
     )
 
-    quick_selected = st.session_state.scan_mode == "Quick Scan"
-    st.markdown('<div class="scan-choice-host">', unsafe_allow_html=True)
-    if st.button(
-        " ",
-        key="scan_quick_circle",
-        type="primary" if quick_selected else "secondary",
-        help="เลือก Quick Scan",
-    ):
-        st.session_state.scan_mode = "Quick Scan"
-        st.rerun()
+    with st.container(border=True):
+        text_col, select_col = st.columns([9, 1], vertical_alignment="top")
+
+        with text_col:
+            st.markdown(
+                """
+                <div class="scan-mode-title">
+                    ⚡ Quick Scan
+                </div>
+                <div class="scan-mode-desc">
+                    ตรวจตัวอย่างสูงสุด 160 captures โดยเน้นช่วงล่าสุดและกระจายทั่ว timeline
+                </div>
+                <div class="scan-mode-meta">
+                    เร็วกว่า · เจอ Cross-domain แล้วหยุดทันที
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with select_col:
+            st.markdown('<div class="scan-radio-inside">', unsafe_allow_html=True)
+            if st.button(
+                " ",
+                key="scan_quick_inside",
+                type="primary" if quick_selected else "secondary",
+                help="เลือก Quick Scan",
+            ):
+                st.session_state.scan_mode = "Quick Scan"
+                st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
+
     st.markdown("</div>", unsafe_allow_html=True)
 
 mode = st.session_state.scan_mode
