@@ -1301,8 +1301,44 @@ if start_clicked or search_clicked:
 
     else:
         try:
-            with st.spinner(f"กำลังโหลดประวัติ 3xx ของ {domain}..."):
-                results, total = scan(domain, mode)
+            # Auto-retry Wayback/CDX connection until it comes back.
+            # This avoids requiring the user to press F5 repeatedly.
+            retry_status = st.empty()
+            retry_attempt = 0
+
+            while True:
+                try:
+                    with st.spinner(f"กำลังโหลดประวัติ 3xx ของ {domain}..."):
+                        results, total = scan(domain, mode)
+                    retry_status.empty()
+                    break
+
+                except requests.ConnectionError:
+                    retry_attempt += 1
+                    wait_seconds = min(20, 2 + (retry_attempt - 1) * 2)
+                    retry_status.warning(
+                        f"🌐 Wayback Machine ยังเชื่อมต่อไม่ได้ · "
+                        f"ระบบกำลังลองใหม่อัตโนมัติใน {wait_seconds} วินาที "
+                        f"(ครั้งที่ {retry_attempt})"
+                    )
+                    time.sleep(wait_seconds)
+
+                except requests.HTTPError as e:
+                    status_code = getattr(getattr(e, "response", None), "status_code", None)
+
+                    if status_code in (429, 500, 502, 503, 504):
+                        retry_attempt += 1
+                        wait_seconds = min(20, 2 + (retry_attempt - 1) * 2)
+                        retry_status.warning(
+                            f"🌐 Wayback Machine ตอบกลับไม่พร้อมใช้งานชั่วคราว"
+                            f"{f' (HTTP {status_code})' if status_code else ''} · "
+                            f"ระบบกำลังลองใหม่อัตโนมัติใน {wait_seconds} วินาที "
+                            f"(ครั้งที่ {retry_attempt})"
+                        )
+                        time.sleep(wait_seconds)
+                        continue
+
+                    raise
 
             if total == 0:
                 st.warning("ไม่พบ 3xx capture ใน Wayback Machine")
@@ -1388,26 +1424,10 @@ if start_clicked or search_clicked:
         except requests.HTTPError as e:
             st.error(f"Wayback/CDX ตอบกลับผิดพลาด: {e}")
 
-        except requests.ConnectionError as e:
+        except requests.ConnectionError:
             st.error(
-                "🌐 ไม่สามารถเชื่อมต่อ Wayback Machine ได้ชั่วคราว\n\n"
-                "Wayback Machine อาจกำลังมีผู้ใช้งานจำนวนมาก หรือการเชื่อมต่อขัดข้องชั่วคราว "
-                "กรุณารอสักครู่แล้วลองใหม่อีกครั้ง"
-            )
-
-            retry_url = (
-                f"?retry_domain={quote(domain)}"
-                f"&retry_nonce={time.time_ns()}"
-            )
-            st.markdown(
-                f"""
-                <a class="wayback-refresh-link"
-                   href="{retry_url}"
-                   target="_self">
-                    🔄 Refresh หน้าเว็บและลองใหม่
-                </a>
-                """,
-                unsafe_allow_html=True,
+                "🌐 การเชื่อมต่อ Wayback Machine ถูกตัดก่อนระบบ Auto Retry เริ่มทำงาน "
+                "กรุณาลองตรวจสอบอีกครั้ง"
             )
 
         except Exception as e:
