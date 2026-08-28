@@ -658,6 +658,44 @@ div[data-testid="stMetricValue"] { color: var(--ink); font-weight: 800; }
 @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; animation: none !important; }
 }
+
+/* ============================================================
+   DOMAIN INPUT ONLY — keep typed domain as normal visible text
+   and hide Streamlit/BaseWeb "Press Enter to apply" helper.
+   ============================================================ */
+
+[data-testid="stTextInput"] input,
+[data-testid="stTextInput"] input:focus,
+[data-testid="stTextInput"] input:active {
+    color: #16203c !important;
+    -webkit-text-fill-color: #16203c !important;
+    opacity: 1 !important;
+    font-family: 'Inter', 'Noto Sans Thai', -apple-system, sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    text-shadow: none !important;
+}
+
+/* BaseWeb/Streamlit instruction overlay shown while editing */
+[data-testid="stTextInput"] [data-baseweb="input"] > div:not(:has(input)),
+[data-testid="stTextInput"] [data-baseweb="base-input"] > div:not(:has(input)) {
+    display: none !important;
+}
+
+/* Some Streamlit versions expose the instruction as a small status/helper node */
+[data-testid="stTextInput"] [role="status"],
+[data-testid="stTextInput"] [aria-live="polite"],
+[data-testid="stTextInput"] small {
+    display: none !important;
+}
+
+/* Do not let any overlay cover the actual text field */
+[data-testid="stTextInput"] input {
+    position: relative !important;
+    z-index: 5 !important;
+    background: transparent !important;
+}
+
 </style>
     """,
     unsafe_allow_html=True,
