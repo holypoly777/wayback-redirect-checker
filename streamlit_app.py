@@ -445,7 +445,93 @@ st.markdown(
     hr {
         border-color: #e7ebf2;
     }
-    </style>
+    
+    /* =========================================================
+       UX IMPROVEMENTS
+       ========================================================= */
+
+    /* All Streamlit button text */
+    div.stButton > button p {
+        font-weight: 750 !important;
+        margin: 0 !important;
+    }
+
+    /* Primary action must always be readable */
+    div.stButton > button[kind="primary"],
+    div.stButton > button[kind="primary"] *,
+    div.stButton > button[kind="primary"] p,
+    div.stButton > button[kind="primary"] span {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }
+
+    /* Mode selection buttons */
+    .mode-title {
+        margin-top: 6px;
+        margin-bottom: 10px;
+        font-size: 1.03rem;
+        font-weight: 800;
+        color: #1c2740;
+    }
+
+    .mode-help {
+        min-height: 60px;
+        margin-top: 9px;
+        padding: 0 4px 2px 4px;
+        color: #6a7488;
+        font-size: .88rem;
+        line-height: 1.55;
+    }
+
+    /* Make mode buttons feel like cards */
+    div[data-testid="stHorizontalBlock"] div.stButton > button {
+        min-height: 64px;
+        border-radius: 14px;
+        font-size: 1rem;
+        transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+    }
+
+    div[data-testid="stHorizontalBlock"] div.stButton > button:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Secondary card/button */
+    div.stButton > button[kind="secondary"] {
+        background: linear-gradient(145deg, #ffffff, #f8faff);
+        border: 1px solid #d7deeb;
+        color: #26334d;
+        box-shadow: 0 7px 18px rgba(35, 49, 85, .05);
+    }
+
+    div.stButton > button[kind="secondary"]:hover {
+        border-color: #aebbd5;
+        background: linear-gradient(145deg, #ffffff, #f4f7ff);
+        color: #1e2d4c;
+        box-shadow: 0 11px 24px rgba(35, 49, 85, .08);
+    }
+
+    /* Selected mode status pill */
+    .selected-mode {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin: 4px 0 14px 0;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #eef3ff, #f3efff);
+        border: 1px solid #d8e0fb;
+        color: #40538f;
+        font-size: .83rem;
+        font-weight: 700;
+    }
+
+    /* Start button gets stronger affordance */
+    div.stButton > button[kind="primary"] {
+        font-size: 1rem !important;
+        text-shadow: 0 1px 1px rgba(0,0,0,.08);
+    }
+
+</style>
     """,
     unsafe_allow_html=True,
 )
@@ -781,59 +867,75 @@ domain_input = st.text_input(
 
 st.markdown("#### เลือกโหมดการสแกน")
 
-c1, c2 = st.columns(2)
+# เก็บโหมดที่เลือกไว้ใน session เพื่อให้กดการ์ดด้านบนได้โดยตรง
+if "scan_mode" not in st.session_state:
+    st.session_state.scan_mode = "Full Scan"
 
-with c1:
+mode_col1, mode_col2 = st.columns(2)
+
+with mode_col1:
+    full_selected = st.session_state.scan_mode == "Full Scan"
+    if st.button(
+        "🔍 Full Scan  ·  แนะนำ",
+        key="choose_full_scan",
+        type="primary" if full_selected else "secondary",
+        use_container_width=True,
+        help="ตรวจทุก 3xx capture และเก็บ Cross-domain ทุกเหตุการณ์",
+    ):
+        st.session_state.scan_mode = "Full Scan"
+        st.rerun()
+
     st.markdown(
         """
-        <div class="scan-card scan-card-primary">
-          <div style="font-size:1.05rem;font-weight:800;">
-            🔍 Full Scan <span class="badge badge-recommended">แนะนำ</span>
-          </div>
-          <div style="margin-top:8px;color:#aeb7d0;">
-            ตรวจทุก 3xx capture ของ Domain และเก็บ Cross-domain ทุกเหตุการณ์
-          </div>
-          <div style="margin-top:8px;color:#7f8bab;font-size:.88rem;">
-            แม่นยำที่สุด · ใช้เวลามากกว่า
-          </div>
+        <div class="mode-help">
+        ตรวจทุก 3xx capture ของ Domain และเก็บหลักฐาน Cross-domain ทุกเหตุการณ์<br>
+        <b>เหมาะเมื่ออยากได้ผลละเอียดที่สุด</b> แต่ใช้เวลามากกว่า
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-with c2:
+with mode_col2:
+    quick_selected = st.session_state.scan_mode == "Quick Scan"
+    if st.button(
+        "⚡ Quick Scan",
+        key="choose_quick_scan",
+        type="primary" if quick_selected else "secondary",
+        use_container_width=True,
+        help="ตรวจตัวอย่างสูงสุด 160 captures และหยุดทันทีเมื่อเจอ Cross-domain",
+    ):
+        st.session_state.scan_mode = "Quick Scan"
+        st.rerun()
+
     st.markdown(
         """
-        <div class="scan-card">
-          <div style="font-size:1.05rem;font-weight:800;">⚡ Quick Scan</div>
-          <div style="margin-top:8px;color:#aeb7d0;">
-            ตรวจตัวอย่างสูงสุด 160 captures โดยเน้นช่วงล่าสุดและกระจายทั่ว timeline
-          </div>
-          <div style="margin-top:8px;color:#7f8bab;font-size:.88rem;">
-            เร็วกว่า · เจอ Cross-domain แล้วหยุดทันที
-          </div>
+        <div class="mode-help">
+        ตรวจตัวอย่างสูงสุด 160 captures โดยเน้นช่วงล่าสุดและกระจายทั่ว timeline<br>
+        <b>เหมาะสำหรับเช็กเบื้องต้น</b> และหยุดทันทีเมื่อเจอ Cross-domain
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-mode = st.radio(
-    "โหมด",
-    ["Full Scan", "Quick Scan"],
-    horizontal=True,
-    index=0,
-    label_visibility="collapsed",
-)
+mode = st.session_state.scan_mode
 
 if mode == "Full Scan":
-    st.info("Full Scan เป็นโหมดแนะนำ: ตรวจทุก 3xx capture ที่ Wayback/CDX ส่งกลับมา")
+    st.markdown(
+        '<div class="selected-mode">✓ เลือก Full Scan · โหมดแนะนำ</div>',
+        unsafe_allow_html=True,
+    )
+    st.info("จะตรวจทุก 3xx capture ที่ Wayback/CDX ส่งกลับมา เพื่อความละเอียดสูงสุด")
 else:
-    st.caption(
-        "Quick Scan เหมาะสำหรับเช็กเบื้องต้น หากไม่พบ Cross-domain "
-        "ยังควรใช้ Full Scan เพื่อยืนยัน"
+    st.markdown(
+        '<div class="selected-mode">⚡ เลือก Quick Scan · ตรวจแบบเร็ว</div>',
+        unsafe_allow_html=True,
+    )
+    st.info(
+        "จะตรวจสูงสุด 160 captures เพื่อเช็กเบื้องต้น "
+        "หากไม่พบ Cross-domain แนะนำให้ใช้ Full Scan เพื่อยืนยัน"
     )
 
-if st.button("เริ่มตรวจสอบ", type="primary", use_container_width=True):
+if st.button("เริ่มตรวจสอบ Domain", type="primary", use_container_width=True):
     domain = normalize_domain(domain_input)
 
     if not domain or "." not in domain:
