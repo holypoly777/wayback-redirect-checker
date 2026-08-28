@@ -730,7 +730,7 @@ def make_session():
         total=3,
         connect=3,
         read=2,
-        backoff_factor=0.7,
+        backoff_factor=0.45,
         status_forcelist=[429, 500, 502, 503, 504],
         allowed_methods=["GET"],
         raise_on_status=False,
@@ -982,7 +982,7 @@ def scan(domain, mode):
         if not full and kind == "CROSS-DOMAIN":
             break
 
-        time.sleep(0.12)
+        time.sleep(0.03)
 
     progress.empty()
     status_box.empty()
@@ -1167,12 +1167,7 @@ else:
         unsafe_allow_html=True,
     )
 
-start_clicked = st.button(
-    "🚀  เริ่มตรวจสอบ",
-    type="primary",
-    use_container_width=True,
-    key="start_btn",
-)
+start_clicked = False
 
 # ---------- Run ----------
 
