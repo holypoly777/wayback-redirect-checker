@@ -716,6 +716,36 @@ div[data-testid="InputInstructions"] {
     pointer-events: none !important;
 }
 
+
+/* Wayback retry button: keep text/background stable on hover */
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button,
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button:hover,
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button:focus,
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button:active {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #16203c !important;
+    -webkit-text-fill-color: #16203c !important;
+    border: 1px solid #e2e4ec !important;
+    box-shadow: none !important;
+}
+
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button *,
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button:hover *,
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button:focus *,
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button:active * {
+    color: #16203c !important;
+    -webkit-text-fill-color: #16203c !important;
+}
+
 </style>
     """,
     unsafe_allow_html=True,
@@ -1122,7 +1152,8 @@ with st.container():
         search_clicked = st.button("ตรวจสอบ", key="search_btn", use_container_width=True)
 
     enter_search_clicked = st.session_state.pop("enter_search_clicked", False)
-    search_clicked = search_clicked or enter_search_clicked
+    retry_wayback_scan = st.session_state.pop("retry_wayback_scan", False)
+    search_clicked = search_clicked or enter_search_clicked or retry_wayback_scan
 
 # ---------- Scan mode ----------
 
@@ -1325,11 +1356,13 @@ if start_clicked or search_clicked:
                 "กรุณารอสักครู่แล้วลองใหม่อีกครั้ง"
             )
 
+            st.markdown('<span class="mk wayback-refresh"></span>', unsafe_allow_html=True)
             if st.button(
                 "🔄 Refresh และลองใหม่",
                 key="wayback_refresh_btn",
                 use_container_width=True,
             ):
+                st.session_state["retry_wayback_scan"] = True
                 st.rerun()
 
         except Exception as e:
