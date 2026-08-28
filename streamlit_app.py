@@ -265,19 +265,39 @@ html, body, .stApp, [class*="css"] {
     width: 100% !important;
     height: 100% !important;
     min-height: 0 !important;
-    font-size: 1rem !important;
-    line-height: 1.6 !important;
     padding: 0 18px !important;
+
+    font-family: 'Inter', 'Noto Sans Thai', -apple-system, sans-serif !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    line-height: 1.6 !important;
+
+    color: #16203c !important;
+    -webkit-text-fill-color: #16203c !important;
+    caret-color: #1d4ed8 !important;
+
+    background: transparent !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
 }
 
 [data-testid="stTextInput"] > div:focus-within {
-    border-color: var(--blue) !important;
-    box-shadow: 0 0 0 4px rgba(29, 78, 216, .10) !important;
+    border-color: #1d4ed8 !important;
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, .09) !important;
 }
 
 [data-testid="stTextInput"] input::placeholder {
-    color: #a3aabb !important;
-    -webkit-text-fill-color: #a3aabb !important;
+    color: #9aa3b5 !important;
+    -webkit-text-fill-color: #9aa3b5 !important;
+    opacity: 1 !important;
+    font-weight: 400 !important;
+}
+
+[data-testid="stTextInput"] input::selection {
+    background: rgba(29, 78, 216, .16) !important;
+    color: #16203c !important;
+    -webkit-text-fill-color: #16203c !important;
 }
 
 [data-testid="stColumn"]:has(.q-btn) .stButton,
