@@ -42,236 +42,410 @@ st.set_page_config(
 
 st.markdown(
     """
-
-
 <style>
-:root{
-  --bg:#f6f8fc;
-  --surface:#ffffff;
-  --text:#182033;
-  --muted:#6f7b90;
-  --line:#dce3ee;
-  --blue:#315fdf;
-  --blue2:#4f73ed;
-  --red:#ff4e58;
-  --pink:#f6245a;
-  --amber:#f7ae24;
-}
+    /* =========================================================
+       Premium Light UI
+       Clean + subtle gradient + depth + modern UX
+       ========================================================= */
 
-.stApp{
-  background:
-    radial-gradient(circle at 92% 3%, rgba(75,111,232,.10), transparent 22%),
-    radial-gradient(circle at 8% 0%, rgba(120,93,220,.06), transparent 18%),
-    linear-gradient(180deg,#fbfcff 0%,#f6f8fc 55%,#f4f6fa 100%);
-  color:var(--text);
-}
+    .stApp {
+        background:
+            radial-gradient(circle at 10% 0%, rgba(76, 110, 245, .10), transparent 24%),
+            radial-gradient(circle at 92% 8%, rgba(141, 96, 255, .08), transparent 22%),
+            linear-gradient(180deg, #fbfcff 0%, #f6f8fc 48%, #f4f6fa 100%);
+        color: #172033;
+    }
 
-.block-container{
-  max-width:1180px;
-  padding-top:1.7rem;
-  padding-bottom:3rem;
-}
+    .block-container {
+        max-width: 1180px;
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+    }
 
-h1,h2,h3,h4{color:var(--text);letter-spacing:-.025em}
+    h1, h2, h3, h4 {
+        color: #172033;
+        letter-spacing: -0.025em;
+    }
 
-/* HERO */
-.hero{
-  position:relative;
-  overflow:hidden;
-  padding:24px 28px;
-  border:1px solid #e0e6ef;
-  border-radius:18px;
-  background:linear-gradient(135deg,rgba(255,255,255,.99),rgba(248,250,255,.97));
-  box-shadow:0 16px 40px rgba(33,48,90,.07);
-  margin-bottom:24px;
-}
-.hero::after{
-  content:"";
-  position:absolute;
-  width:330px;height:220px;
-  right:-95px;top:-120px;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(75,111,232,.18),transparent 68%);
-}
-.hero-title{
-  position:relative;z-index:1;
-  font-size:2rem;font-weight:850;
-  color:#1d2942;
-  -webkit-text-fill-color:#1d2942;
-}
-.hero-sub{
-  position:relative;z-index:1;
-  color:#69758a;margin-top:8px;font-size:.96rem;
-}
+    p, label, .stMarkdown {
+        color: #27324a;
+    }
 
-/* SECTION TITLE */
-.section-head{
-  display:flex;align-items:center;gap:12px;
-  margin:4px 0 12px;
-}
-.section-icon{
-  width:42px;height:42px;border-radius:11px;
-  display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(145deg,#eef3ff,#e6edff);
-  color:#315fdf;font-size:1.15rem;
-  box-shadow:0 3px 10px rgba(49,95,223,.08);
-}
-.section-icon.red{
-  background:linear-gradient(145deg,#fff1f3,#ffe6ea);
-  color:#ef4052;
-}
-.section-title{font-weight:850;font-size:1.2rem;color:#1c2740}
-.section-sub{font-size:.84rem;color:#7b8598;margin-top:2px}
+    /* -------------------------
+       Header / Hero
+       ------------------------- */
 
-/* DOMAIN CARD */
-.domain-card{
-  border:1px solid #dce3ee;
-  border-radius:16px;
-  background:rgba(255,255,255,.95);
-  box-shadow:0 10px 26px rgba(33,48,90,.045);
-  padding:20px 20px 16px;
-  margin-bottom:24px;
-}
-[data-testid="stTextInput"] input{
-  min-height:50px;
-  border-radius:10px;
-  background:#fff;
-  color:#172033;
-  border:1px solid #cdd7e6;
-  box-shadow:0 4px 12px rgba(35,50,90,.025);
-}
-[data-testid="stTextInput"] input:focus{
-  border-color:#3d68df;
-  box-shadow:0 0 0 4px rgba(61,104,223,.10);
-}
+    .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 26px 28px;
+        border: 1px solid rgba(205, 214, 230, .92);
+        border-radius: 20px;
+        background:
+            linear-gradient(135deg, rgba(255,255,255,.98), rgba(247,249,255,.94));
+        margin-bottom: 24px;
+        box-shadow:
+            0 18px 45px rgba(34, 49, 91, .07),
+            0 2px 8px rgba(34, 49, 91, .03);
+        backdrop-filter: blur(10px);
+    }
 
-/* BLUE DOMAIN CHECK BUTTON */
-.domain-check div.stButton > button{
-  min-height:50px !important;
-  border-radius:10px !important;
-  background:linear-gradient(90deg,#315fdf,#416ce8) !important;
-  border:none !important;
-  color:#fff !important;
-  font-weight:800 !important;
-  box-shadow:0 8px 18px rgba(49,95,223,.17) !important;
-}
-.domain-check div.stButton > button *{
-  color:#fff !important;
-  -webkit-text-fill-color:#fff !important;
-}
+    .hero::before {
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        right: -90px;
+        top: -125px;
+        border-radius: 50%;
+        background:
+            radial-gradient(circle, rgba(93, 108, 255, .20), rgba(93, 108, 255, 0) 68%);
+        pointer-events: none;
+    }
 
-/* SCAN CARDS */
-[data-testid="stVerticalBlockBorderWrapper"]{
-  border-radius:16px !important;
-  border:1px solid #dfe5ee !important;
-  background:linear-gradient(145deg,#fff,#fbfcff) !important;
-  box-shadow:0 9px 24px rgba(34,47,80,.045) !important;
-  transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
-}
-[data-testid="stVerticalBlockBorderWrapper"]:hover{
-  transform:translateY(-2px);
-  box-shadow:0 14px 30px rgba(34,47,80,.07) !important;
-}
+    .hero::after {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        left: -80px;
+        bottom: -120px;
+        border-radius: 50%;
+        background:
+            radial-gradient(circle, rgba(140, 87, 255, .10), rgba(140, 87, 255, 0) 70%);
+        pointer-events: none;
+    }
 
-/* MODE BUTTONS: both stay light, selection is shown via badges/content */
-.mode-button div.stButton > button{
-  min-height:54px !important;
-  border-radius:12px !important;
-  background:linear-gradient(180deg,#fff,#f8faff) !important;
-  color:#1f2b43 !important;
-  border:1px solid #d5ddea !important;
-  font-weight:850 !important;
-  box-shadow:0 5px 14px rgba(35,49,85,.035) !important;
-}
-.mode-button div.stButton > button *{
-  color:#1f2b43 !important;
-  -webkit-text-fill-color:#1f2b43 !important;
-}
-.mode-button div.stButton > button:hover{
-  border-color:#b6c3da !important;
-  transform:translateY(-1px);
-}
-.mode-copy{
-  padding:4px 4px 8px;
-  color:#536177;
-  line-height:1.6;
-  font-size:.92rem;
-}
-.mode-copy b{color:#29364d}
-.mode-note{margin-top:7px;color:#818c9f;font-size:.83rem}
-.mode-selected{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:5px 9px;border-radius:999px;
-  background:#ffe9ec;border:1px solid #ffd1d7;
-  color:#df3b4d;font-size:.75rem;font-weight:850;
-  margin:0 0 6px 2px;
-}
-.mode-unselected{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:5px 9px;border-radius:999px;
-  background:#f5f7fb;border:1px solid #e1e6ef;
-  color:#7c8799;font-size:.75rem;font-weight:750;
-  margin:0 0 6px 2px;
-}
+    .hero-title {
+        position: relative;
+        z-index: 1;
+        font-size: 2.05rem;
+        font-weight: 850;
+        margin: 0;
+        background: linear-gradient(90deg, #22479f 0%, #4769d9 48%, #7d55d9 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
 
-/* INFO */
-[data-testid="stAlert"]{border-radius:12px}
+    .hero-sub {
+        position: relative;
+        z-index: 1;
+        margin-top: 9px;
+        color: #667085;
+        font-size: .98rem;
+    }
 
-/* CTA */
-.cta div.stButton > button{
-  min-height:52px !important;
-  border-radius:12px !important;
-  background:linear-gradient(90deg,#f6245a,#ff4e58) !important;
-  border:none !important;
-  color:#fff !important;
-  font-size:1rem !important;
-  font-weight:850 !important;
-  box-shadow:0 12px 24px rgba(246,36,90,.20) !important;
-}
-.cta div.stButton > button *{
-  color:#fff !important;
-  -webkit-text-fill-color:#fff !important;
-}
-.cta div.stButton > button:hover{
-  transform:translateY(-1px);
-  filter:brightness(1.025);
-  box-shadow:0 16px 28px rgba(246,36,90,.23) !important;
-}
+    /* -------------------------
+       Domain input
+       ------------------------- */
 
-/* RESULTS */
-div[data-testid="stMetric"]{
-  background:linear-gradient(145deg,#fff,#fbfcff);
-  border:1px solid #e0e6ef;
-  border-radius:14px;
-  padding:16px;
-  box-shadow:0 8px 20px rgba(32,45,81,.04);
-}
-div[data-testid="stMetricLabel"]{color:#6c768a}
-div[data-testid="stMetricValue"]{color:#172033;font-weight:800}
+    [data-testid="stTextInput"] input {
+        background:
+            linear-gradient(180deg, #ffffff, #fbfcff);
+        border: 1px solid #d8dfeb;
+        border-radius: 12px;
+        color: #172033;
+        min-height: 50px;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.85),
+            0 4px 12px rgba(35, 50, 90, .035);
+        transition: all .18s ease;
+    }
 
-.evidence{
-  border:1px solid #efc8ce;
-  border-left:4px solid #dd4858;
-  border-radius:14px;
-  padding:18px;
-  background:linear-gradient(145deg,#fff,#fff6f7);
-  margin:12px 0;
-  box-shadow:0 10px 24px rgba(140,35,50,.05);
-}
-.evidence div{color:#293247 !important}
-.evidence div[style*="color:#ff8899"]{color:#c53c4c !important}
-.evidence div[style*="color:#9aa6c3"]{color:#747f91 !important}
+    [data-testid="stTextInput"] input:hover {
+        border-color: #c7d1e5;
+    }
 
-[data-testid="stExpander"]{
-  background:#fff;border-color:#e0e6ee;border-radius:12px;
-}
+    [data-testid="stTextInput"] input:focus {
+        border-color: #5570d8;
+        box-shadow:
+            0 0 0 4px rgba(85,112,216,.10),
+            0 8px 18px rgba(35, 50, 90, .05);
+        transform: translateY(-1px);
+    }
 
-.footer-note{
-  color:#8a94a6;text-align:center;font-size:.82rem;margin-top:28px;
-}
-</style>
+    [data-testid="stTextInput"] input::placeholder {
+        color: #929bad;
+    }
 
+    /* -------------------------
+       Scan cards
+       ------------------------- */
 
+    .scan-card {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #dfe5ef;
+        background:
+            linear-gradient(155deg, rgba(255,255,255,.98), rgba(248,250,255,.94));
+        border-radius: 16px;
+        padding: 18px 19px;
+        min-height: 138px;
+        box-shadow:
+            0 8px 22px rgba(32, 45, 81, .045),
+            0 1px 2px rgba(32, 45, 81, .02);
+        transition:
+            transform .18s ease,
+            box-shadow .18s ease,
+            border-color .18s ease;
+    }
+
+    .scan-card:hover {
+        transform: translateY(-2px);
+        border-color: #cbd5e7;
+        box-shadow:
+            0 14px 28px rgba(32, 45, 81, .07),
+            0 2px 5px rgba(32, 45, 81, .03);
+    }
+
+    .scan-card::after {
+        content: "";
+        position: absolute;
+        width: 110px;
+        height: 110px;
+        right: -45px;
+        top: -42px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(82,113,215,.08), transparent 68%);
+        pointer-events: none;
+    }
+
+    .scan-card-primary {
+        border: 1.5px solid rgba(78, 105, 210, .78);
+        background:
+            linear-gradient(145deg, #ffffff 0%, #f7f9ff 58%, #f2f5ff 100%);
+        box-shadow:
+            0 12px 28px rgba(65, 91, 190, .09),
+            inset 0 1px 0 rgba(255,255,255,.95);
+    }
+
+    .scan-card-primary::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, #5271d7, #745de1);
+        border-radius: 16px 0 0 16px;
+    }
+
+    .scan-card div {
+        color: #25304a !important;
+    }
+
+    .scan-card div[style*="color:#aeb7d0"] {
+        color: #5f6b80 !important;
+    }
+
+    .scan-card div[style*="color:#7f8bab"] {
+        color: #7c8699 !important;
+    }
+
+    .badge {
+        display: inline-block;
+        font-size: .72rem;
+        font-weight: 750;
+        padding: 4px 9px;
+        border-radius: 999px;
+        margin-left: 7px;
+        vertical-align: middle;
+    }
+
+    .badge-recommended {
+        background:
+            linear-gradient(90deg, #edf2ff, #f3edff);
+        color: #4058b8;
+        border: 1px solid #cfdbff;
+        box-shadow: 0 2px 6px rgba(75, 95, 180, .06);
+    }
+
+    /* -------------------------
+       Radio
+       ------------------------- */
+
+    [data-testid="stRadio"] {
+        background: transparent;
+    }
+
+    [data-testid="stRadio"] label {
+        color: #25304a !important;
+        font-weight: 550;
+    }
+
+    /* -------------------------
+       Main button
+       ------------------------- */
+
+    div.stButton > button[kind="primary"] {
+        background:
+            linear-gradient(90deg, #315bc8 0%, #4f67dc 52%, #6d5bd9 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 12px;
+        min-height: 50px;
+        font-weight: 750;
+        letter-spacing: .01em;
+        box-shadow:
+            0 10px 22px rgba(64, 82, 190, .20),
+            inset 0 1px 0 rgba(255,255,255,.25);
+        transition: all .18s ease;
+    }
+
+    div.stButton > button[kind="primary"]:hover {
+        filter: brightness(1.035);
+        transform: translateY(-1px);
+        box-shadow:
+            0 14px 28px rgba(64, 82, 190, .24),
+            inset 0 1px 0 rgba(255,255,255,.28);
+        color: #ffffff;
+    }
+
+    div.stButton > button[kind="primary"]:active {
+        transform: translateY(0px);
+    }
+
+    /* -------------------------
+       Info / Alerts
+       ------------------------- */
+
+    [data-testid="stAlert"] {
+        border-radius: 13px;
+        box-shadow: 0 5px 14px rgba(28, 40, 72, .035);
+        border-width: 1px;
+    }
+
+    /* -------------------------
+       Metric cards
+       ------------------------- */
+
+    div[data-testid="stMetric"] {
+        position: relative;
+        overflow: hidden;
+        background:
+            linear-gradient(150deg, #ffffff 0%, #fbfcff 100%);
+        border: 1px solid #e0e6ef;
+        padding: 17px;
+        border-radius: 15px;
+        box-shadow:
+            0 8px 22px rgba(32, 45, 81, .045),
+            0 1px 2px rgba(32, 45, 81, .02);
+    }
+
+    div[data-testid="stMetric"]::after {
+        content: "";
+        position: absolute;
+        width: 70px;
+        height: 70px;
+        top: -35px;
+        right: -30px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(75,105,210,.08), transparent 70%);
+        pointer-events: none;
+    }
+
+    div[data-testid="stMetricLabel"] {
+        color: #6c768a;
+        font-weight: 600;
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: #172033;
+        font-weight: 800;
+    }
+
+    /* -------------------------
+       Cross-domain evidence
+       ------------------------- */
+
+    .evidence {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #efc9cf;
+        border-left: 4px solid #d94b5b;
+        border-radius: 14px;
+        padding: 19px;
+        background:
+            linear-gradient(145deg, #fffefe 0%, #fff7f8 100%);
+        margin: 13px 0;
+        box-shadow:
+            0 10px 24px rgba(140, 35, 50, .055);
+    }
+
+    .evidence::after {
+        content: "";
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        right: -55px;
+        top: -55px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(217,75,91,.10), transparent 68%);
+    }
+
+    .evidence div {
+        color: #293247 !important;
+    }
+
+    .evidence div[style*="color:#ff8899"] {
+        color: #c53c4c !important;
+        font-weight: 700;
+    }
+
+    .evidence div[style*="color:#9aa6c3"] {
+        color: #747f91 !important;
+    }
+
+    /* -------------------------
+       Expanders / Table
+       ------------------------- */
+
+    [data-testid="stExpander"] {
+        background:
+            linear-gradient(180deg, rgba(255,255,255,.96), rgba(250,251,254,.96));
+        border-color: #e0e6ee;
+        border-radius: 13px;
+        box-shadow: 0 5px 14px rgba(28, 40, 72, .025);
+    }
+
+    /* -------------------------
+       Secondary buttons
+       ------------------------- */
+
+    [data-testid="stDownloadButton"] button,
+    [data-testid="stLinkButton"] a {
+        border-radius: 11px !important;
+        background:
+            linear-gradient(180deg, #ffffff, #f8faff) !important;
+        color: #26334d !important;
+        border: 1px solid #d7deea !important;
+        box-shadow: 0 4px 10px rgba(31, 46, 84, .035);
+        transition: all .16s ease;
+    }
+
+    [data-testid="stDownloadButton"] button:hover,
+    [data-testid="stLinkButton"] a:hover {
+        border-color: #bbc7df !important;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px rgba(31, 46, 84, .055);
+    }
+
+    /* -------------------------
+       Footer
+       ------------------------- */
+
+    .footer-note {
+        color: #8a94a6;
+        text-align: center;
+        font-size: .82rem;
+        margin-top: 30px;
+        padding-top: 8px;
+    }
+
+    hr {
+        border-color: #e7ebf2;
+    }
+    </style>
     """,
     unsafe_allow_html=True,
 )
@@ -597,115 +771,69 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown(
-    """
-    <div class="section-head">
-      <div class="section-icon">🌐</div>
-      <div>
-        <div class="section-title">ตรวจสอบ Domain</div>
-        <div class="section-sub">กรอก Domain ที่ต้องการตรวจสอบ</div>
-      </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
+st.subheader("ตรวจสอบ Domain")
+
+domain_input = st.text_input(
+    "Domain",
+    placeholder="เช่น idea.me หรือ footballgibraltar.com",
+    label_visibility="collapsed",
 )
 
-# input + small blue validation button
-input_col, check_col = st.columns([6.5, 1.2], gap="small")
+st.markdown("#### เลือกโหมดการสแกน")
 
-with input_col:
-    domain_input = st.text_input(
-        "Domain",
-        placeholder="เช่น idea.me หรือ footballgibraltar.com",
-        label_visibility="collapsed",
+c1, c2 = st.columns(2)
+
+with c1:
+    st.markdown(
+        """
+        <div class="scan-card scan-card-primary">
+          <div style="font-size:1.05rem;font-weight:800;">
+            🔍 Full Scan <span class="badge badge-recommended">แนะนำ</span>
+          </div>
+          <div style="margin-top:8px;color:#aeb7d0;">
+            ตรวจทุก 3xx capture ของ Domain และเก็บ Cross-domain ทุกเหตุการณ์
+          </div>
+          <div style="margin-top:8px;color:#7f8bab;font-size:.88rem;">
+            แม่นยำที่สุด · ใช้เวลามากกว่า
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
-with check_col:
-    st.markdown('<div class="domain-check">', unsafe_allow_html=True)
-    check_domain = st.button("🔍 ตรวจสอบ", use_container_width=True, key="validate_domain")
-    st.markdown('</div>', unsafe_allow_html=True)
+with c2:
+    st.markdown(
+        """
+        <div class="scan-card">
+          <div style="font-size:1.05rem;font-weight:800;">⚡ Quick Scan</div>
+          <div style="margin-top:8px;color:#aeb7d0;">
+            ตรวจตัวอย่างสูงสุด 160 captures โดยเน้นช่วงล่าสุดและกระจายทั่ว timeline
+          </div>
+          <div style="margin-top:8px;color:#7f8bab;font-size:.88rem;">
+            เร็วกว่า · เจอ Cross-domain แล้วหยุดทันที
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-if check_domain:
-    preview_domain = normalize_domain(domain_input)
-    if preview_domain and "." in preview_domain:
-        st.success(f"รูปแบบ Domain ใช้งานได้: {preview_domain}")
-    else:
-        st.warning("กรุณาใส่ Domain ให้ถูกต้อง เช่น idea.me")
-
-st.markdown(
-    """
-    <div class="section-head" style="margin-top:22px;">
-      <div class="section-icon red">🎯</div>
-      <div>
-        <div class="section-title">เลือกโหมดการสแกน</div>
-        <div class="section-sub">เลือกโหมดที่เหมาะกับความต้องการของคุณ</div>
-      </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
+mode = st.radio(
+    "โหมด",
+    ["Full Scan", "Quick Scan"],
+    horizontal=True,
+    index=0,
+    label_visibility="collapsed",
 )
-
-if "scan_mode" not in st.session_state:
-    st.session_state.scan_mode = "Full Scan"
-
-full_col, quick_col = st.columns(2, gap="medium")
-
-with full_col:
-    with st.container(border=True):
-        if st.session_state.scan_mode == "Full Scan":
-            st.markdown('<div class="mode-selected">✓ เลือกอยู่ · แนะนำ</div>', unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="mode-unselected">○ ยังไม่ได้เลือก</div>', unsafe_allow_html=True)
-
-        st.markdown('<div class="mode-button">', unsafe_allow_html=True)
-        if st.button("🔍 Full Scan", key="choose_full_scan", use_container_width=True):
-            st.session_state.scan_mode = "Full Scan"
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        st.markdown(
-            """
-            <div class="mode-copy">
-              ตรวจทุก 3xx capture ของ Domain และเก็บหลักฐาน
-              <b>Cross-domain ทุกเหตุการณ์</b>
-              <div class="mode-note">⭐ ละเอียดที่สุด · ใช้เวลามากกว่า</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-with quick_col:
-    with st.container(border=True):
-        if st.session_state.scan_mode == "Quick Scan":
-            st.markdown('<div class="mode-selected">✓ เลือกอยู่</div>', unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="mode-unselected">○ ยังไม่ได้เลือก</div>', unsafe_allow_html=True)
-
-        st.markdown('<div class="mode-button">', unsafe_allow_html=True)
-        if st.button("⚡ Quick Scan", key="choose_quick_scan", use_container_width=True):
-            st.session_state.scan_mode = "Quick Scan"
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        st.markdown(
-            """
-            <div class="mode-copy">
-              ตรวจตัวอย่างสูงสุด 160 captures โดยเน้นช่วงล่าสุด
-              และกระจายทั่ว timeline
-              <div class="mode-note">🕘 เร็วกว่า · เหมาะสำหรับเช็กเบื้องต้น</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-mode = st.session_state.scan_mode
 
 if mode == "Full Scan":
     st.info("Full Scan เป็นโหมดแนะนำ: ตรวจทุก 3xx capture ที่ Wayback/CDX ส่งกลับมา")
 else:
-    st.info("Quick Scan ตรวจสูงสุด 160 captures หากไม่พบ Cross-domain แนะนำให้ใช้ Full Scan เพื่อยืนยัน")
+    st.caption(
+        "Quick Scan เหมาะสำหรับเช็กเบื้องต้น หากไม่พบ Cross-domain "
+        "ยังควรใช้ Full Scan เพื่อยืนยัน"
+    )
 
-if st.button("🚀 เริ่มตรวจสอบ", type="primary", use_container_width=True):
+if st.button("เริ่มตรวจสอบ", type="primary", use_container_width=True):
     domain = normalize_domain(domain_input)
 
     if not domain or "." not in domain:
