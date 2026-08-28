@@ -696,6 +696,24 @@ div[data-testid="stMetricValue"] { color: var(--ink); font-weight: 800; }
     background: transparent !important;
 }
 
+
+/* DOMAIN INPUT ONLY:
+   Hide Streamlit's keyboard hint ("Press Enter to apply") completely. */
+[data-testid="stTextInput"] [data-testid="InputInstructions"],
+[data-testid="stTextInput"] div[data-testid="InputInstructions"],
+[data-testid="stTextInput"] [data-testid="InputInstructions"] *,
+div[data-testid="InputInstructions"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+}
+
 </style>
     """,
     unsafe_allow_html=True,
