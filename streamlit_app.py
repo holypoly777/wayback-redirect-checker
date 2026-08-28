@@ -977,7 +977,12 @@ def scan(domain, mode):
         )
 
         progress.progress(i / len(todo), text=f"กำลังตรวจ {i:,}/{len(todo):,}")
-        status_box.caption(f"ล่าสุด: {date} · HTTP {archived_status} · {kind}")
+        mode_label = "Full Scan" if full else "Quick Scan"
+        status_box.info(
+            f"🔄 กำลังสแกน {mode_label} · "
+            f"{i:,}/{len(todo):,} captures · "
+            f"{date} · HTTP {archived_status} · {kind}"
+        )
 
         if not full and kind == "CROSS-DOMAIN":
             break
