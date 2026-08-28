@@ -1,0 +1,7 @@
+# วางไฟล์นี้ไว้ที่ .streamlit/config.toml ข้าง ๆ streamlit_app.py
+[theme]
+base = "light"
+primaryColor = "#1d4ed8"
+backgroundColor = "#f8f7fd"
+secondaryBackgroundColor = "#ffffff"
+textColor = "#16203c"
