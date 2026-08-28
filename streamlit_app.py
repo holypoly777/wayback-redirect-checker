@@ -5,7 +5,7 @@ import re
 import time
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from urllib.parse import urlparse, unquote
+from urllib.parse import urlparse, unquote, quote
 
 import requests
 import streamlit as st
@@ -746,6 +746,31 @@ div[data-testid="stElementContainer"]:has(.wayback-refresh)
     -webkit-text-fill-color: #16203c !important;
 }
 
+
+/* True browser refresh link — intentionally NO hover color change */
+.wayback-refresh-link,
+.wayback-refresh-link:visited,
+.wayback-refresh-link:hover,
+.wayback-refresh-link:focus,
+.wayback-refresh-link:active {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    min-height: 52px !important;
+    margin-top: 10px !important;
+    padding: 0 18px !important;
+    border: 1px solid #e2e4ec !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    color: #16203c !important;
+    -webkit-text-fill-color: #16203c !important;
+    text-decoration: none !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+}
+
 </style>
     """,
     unsafe_allow_html=True,
@@ -1134,6 +1159,21 @@ with st.container():
 
     q1, q2 = st.columns([0.76, 0.24])
 
+    # A browser-level retry comes back through query params.
+    # Process each retry nonce only once, refill the same domain, then auto-scan.
+    retry_domain_qp = st.query_params.get("retry_domain", "")
+    retry_nonce_qp = st.query_params.get("retry_nonce", "")
+    browser_retry_clicked = False
+
+    if (
+        retry_domain_qp
+        and retry_nonce_qp
+        and st.session_state.get("_processed_retry_nonce") != retry_nonce_qp
+    ):
+        st.session_state["domain_input"] = retry_domain_qp
+        st.session_state["_processed_retry_nonce"] = retry_nonce_qp
+        browser_retry_clicked = True
+
     def _submit_domain():
         st.session_state["enter_search_clicked"] = True
 
@@ -1152,8 +1192,7 @@ with st.container():
         search_clicked = st.button("ตรวจสอบ", key="search_btn", use_container_width=True)
 
     enter_search_clicked = st.session_state.pop("enter_search_clicked", False)
-    retry_wayback_scan = st.session_state.pop("retry_wayback_scan", False)
-    search_clicked = search_clicked or enter_search_clicked or retry_wayback_scan
+    search_clicked = search_clicked or enter_search_clicked or browser_retry_clicked
 
 # ---------- Scan mode ----------
 
@@ -1356,14 +1395,20 @@ if start_clicked or search_clicked:
                 "กรุณารอสักครู่แล้วลองใหม่อีกครั้ง"
             )
 
-            st.markdown('<span class="mk wayback-refresh"></span>', unsafe_allow_html=True)
-            if st.button(
-                "🔄 Refresh และลองใหม่",
-                key="wayback_refresh_btn",
-                use_container_width=True,
-            ):
-                st.session_state["retry_wayback_scan"] = True
-                st.rerun()
+            retry_url = (
+                f"?retry_domain={quote(domain)}"
+                f"&retry_nonce={time.time_ns()}"
+            )
+            st.markdown(
+                f"""
+                <a class="wayback-refresh-link"
+                   href="{retry_url}"
+                   target="_self">
+                    🔄 Refresh หน้าเว็บและลองใหม่
+                </a>
+                """,
+                unsafe_allow_html=True,
+            )
 
         except Exception as e:
             st.error(f"เกิดข้อผิดพลาด: {e}")
