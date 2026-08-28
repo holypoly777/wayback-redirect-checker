@@ -5,7 +5,7 @@ import re
 import time
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from urllib.parse import urlparse, unquote
+from urllib.parse import urlparse, unquote, quote
 
 import requests
 import streamlit as st
@@ -716,6 +716,61 @@ div[data-testid="InputInstructions"] {
     pointer-events: none !important;
 }
 
+
+/* Wayback retry button: keep text/background stable on hover */
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button,
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button:hover,
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button:focus,
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button:active {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #16203c !important;
+    -webkit-text-fill-color: #16203c !important;
+    border: 1px solid #e2e4ec !important;
+    box-shadow: none !important;
+}
+
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button *,
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button:hover *,
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button:focus *,
+div[data-testid="stElementContainer"]:has(.wayback-refresh)
++ div[data-testid="stElementContainer"] button:active * {
+    color: #16203c !important;
+    -webkit-text-fill-color: #16203c !important;
+}
+
+
+/* True browser refresh link — intentionally NO hover color change */
+.wayback-refresh-link,
+.wayback-refresh-link:visited,
+.wayback-refresh-link:hover,
+.wayback-refresh-link:focus,
+.wayback-refresh-link:active {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    min-height: 52px !important;
+    margin-top: 10px !important;
+    padding: 0 18px !important;
+    border: 1px solid #e2e4ec !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    color: #16203c !important;
+    -webkit-text-fill-color: #16203c !important;
+    text-decoration: none !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+}
+
 </style>
     """,
     unsafe_allow_html=True,
@@ -732,16 +787,17 @@ def make_session():
         total=2,
         connect=2,
         read=1,
-        backoff_factor=0.25,
+        backoff_factor=0.8,
         status_forcelist=[429, 500, 502, 503, 504],
         allowed_methods=["GET"],
+        respect_retry_after_header=True,
         raise_on_status=False,
     )
     adapter = HTTPAdapter(
         max_retries=retry,
-        pool_connections=24,
-        pool_maxsize=24,
-        pool_block=False,
+        pool_connections=8,
+        pool_maxsize=8,
+        pool_block=True,
     )
     session.mount("https://", adapter)
     session.mount("http://", adapter)
@@ -825,7 +881,7 @@ def inspect_capture(timestamp, original):
     for replay in candidates:
         try:
             # Shorter timeout keeps dead/slow Wayback snapshots from blocking the scan.
-            r = session.get(replay, timeout=(3.5, 7), allow_redirects=False)
+            r = session.get(replay, timeout=(5, 12), allow_redirects=False)
             last_status = r.status_code
 
             target = clean_location(r.headers.get("Location", ""))
@@ -881,7 +937,10 @@ def get_all_3xx_captures(domain):
         "matchType": "domain",
     }
 
-    r = requests.get(CDX, params=params, headers=HEADERS, timeout=60)
+    # Use the retry-enabled shared session here too.
+    # The previous raw requests.get() meant the very first CDX connection
+    # could fail immediately even though replay requests had retry support.
+    r = SESSION.get(CDX, params=params, timeout=(8, 35))
     r.raise_for_status()
 
     data = r.json()
@@ -950,6 +1009,80 @@ def build_quick_order(captures, max_checks=160):
     return [captures[i] for i in indexes]
 
 
+
+def diagnose_wayback(domain):
+    """
+    Lightweight connectivity diagnostic for Streamlit Cloud -> Wayback.
+    Returns a dict with three independent checks:
+      1) web.archive.org root reachability
+      2) tiny CDX query (limit=1)
+      3) replay reachability for one capture when available
+    """
+    report = {
+        "root_ok": False,
+        "root_detail": "",
+        "cdx_ok": False,
+        "cdx_detail": "",
+        "replay_ok": None,
+        "replay_detail": "",
+    }
+
+    # 1) Root connectivity
+    try:
+        r = SESSION.get(
+            "https://web.archive.org/",
+            timeout=(6, 15),
+            allow_redirects=False,
+        )
+        report["root_ok"] = r.status_code < 500
+        report["root_detail"] = f"HTTP {r.status_code}"
+    except Exception as e:
+        report["root_detail"] = f"{type(e).__name__}: {e}"
+
+    # 2) Tiny CDX request
+    params = {
+        "url": domain,
+        "output": "json",
+        "fl": "timestamp,original,statuscode",
+        "filter": "statuscode:3..",
+        "limit": "1",
+    }
+
+    sample_capture = None
+    try:
+        r = SESSION.get(CDX, params=params, timeout=(8, 20))
+        r.raise_for_status()
+        data = r.json()
+        report["cdx_ok"] = True
+        report["cdx_detail"] = f"HTTP {r.status_code}"
+
+        if isinstance(data, list) and len(data) > 1:
+            header = data[0]
+            values = data[1]
+            sample_capture = dict(zip(header, values))
+    except Exception as e:
+        report["cdx_detail"] = f"{type(e).__name__}: {e}"
+
+    # 3) Replay reachability, only when the tiny CDX query returned a capture.
+    if sample_capture:
+        ts = sample_capture.get("timestamp", "")
+        original = sample_capture.get("original", "")
+        replay = f"{WAYBACK}/{ts}id_/{original}"
+
+        try:
+            r = SESSION.get(
+                replay,
+                timeout=(6, 15),
+                allow_redirects=False,
+            )
+            report["replay_ok"] = r.status_code < 500
+            report["replay_detail"] = f"HTTP {r.status_code}"
+        except Exception as e:
+            report["replay_ok"] = False
+            report["replay_detail"] = f"{type(e).__name__}: {e}"
+
+    return report
+
 def scan(domain, mode):
     captures = get_all_3xx_captures(domain)
 
@@ -962,9 +1095,8 @@ def scan(domain, mode):
     progress = st.progress(0, text="กำลังเตรียม Wayback captures...")
     status_box = st.empty()
 
-    # Conservative concurrency: much faster than sequential requests while
-    # avoiding an unnecessarily aggressive burst toward Internet Archive.
-    max_workers = 12 if full else 16
+    # Stable Turbo: bounded concurrency for speed without flooding Internet Archive.
+    max_workers = 4 if full else 5
     completed = 0
     results_by_index = {}
     cross_found = False
@@ -975,6 +1107,9 @@ def scan(domain, mode):
         archived_status = row.get("statuscode", "")
 
         try:
+            # Stagger worker starts slightly so Streamlit Cloud does not hit
+            # Wayback with a burst of simultaneous new connections.
+            time.sleep((index % max_workers) * 0.10)
             target, replay, error, replay_http = inspect_capture(ts, source)
         except Exception as e:
             target, replay, error, replay_http = "", "", str(e), ""
@@ -1104,17 +1239,40 @@ with st.container():
 
     q1, q2 = st.columns([0.76, 0.24])
 
+    # A browser-level retry comes back through query params.
+    # Process each retry nonce only once, refill the same domain, then auto-scan.
+    retry_domain_qp = st.query_params.get("retry_domain", "")
+    retry_nonce_qp = st.query_params.get("retry_nonce", "")
+    browser_retry_clicked = False
+
+    if (
+        retry_domain_qp
+        and retry_nonce_qp
+        and st.session_state.get("_processed_retry_nonce") != retry_nonce_qp
+    ):
+        st.session_state["domain_input"] = retry_domain_qp
+        st.session_state["_processed_retry_nonce"] = retry_nonce_qp
+        browser_retry_clicked = True
+
+    def _submit_domain():
+        st.session_state["enter_search_clicked"] = True
+
     with q1:
         st.markdown('<span class="mk q-input"></span>', unsafe_allow_html=True)
         domain_input = st.text_input(
             "Domain",
             placeholder="เช่น UFABET.com หรือ footballgibraltar.com",
             label_visibility="collapsed",
+            key="domain_input",
+            on_change=_submit_domain,
         )
 
     with q2:
         st.markdown('<span class="mk q-btn"></span>', unsafe_allow_html=True)
         search_clicked = st.button("ตรวจสอบ", key="search_btn", use_container_width=True)
+
+    enter_search_clicked = st.session_state.pop("enter_search_clicked", False)
+    search_clicked = search_clicked or enter_search_clicked or browser_retry_clicked
 
 # ---------- Scan mode ----------
 
@@ -1223,8 +1381,44 @@ if start_clicked or search_clicked:
 
     else:
         try:
-            with st.spinner(f"กำลังโหลดประวัติ 3xx ของ {domain}..."):
-                results, total = scan(domain, mode)
+            # Auto-retry Wayback/CDX connection until it comes back.
+            # This avoids requiring the user to press F5 repeatedly.
+            retry_status = st.empty()
+            retry_attempt = 0
+
+            while True:
+                try:
+                    with st.spinner(f"กำลังโหลดประวัติ 3xx ของ {domain}..."):
+                        results, total = scan(domain, mode)
+                    retry_status.empty()
+                    break
+
+                except requests.ConnectionError:
+                    retry_attempt += 1
+                    wait_seconds = min(20, 2 + (retry_attempt - 1) * 2)
+                    retry_status.warning(
+                        f"🌐 Wayback Machine ยังเชื่อมต่อไม่ได้ · "
+                        f"ระบบกำลังลองใหม่อัตโนมัติใน {wait_seconds} วินาที "
+                        f"(ครั้งที่ {retry_attempt})"
+                    )
+                    time.sleep(wait_seconds)
+
+                except requests.HTTPError as e:
+                    status_code = getattr(getattr(e, "response", None), "status_code", None)
+
+                    if status_code in (429, 500, 502, 503, 504):
+                        retry_attempt += 1
+                        wait_seconds = min(20, 2 + (retry_attempt - 1) * 2)
+                        retry_status.warning(
+                            f"🌐 Wayback Machine ตอบกลับไม่พร้อมใช้งานชั่วคราว"
+                            f"{f' (HTTP {status_code})' if status_code else ''} · "
+                            f"ระบบกำลังลองใหม่อัตโนมัติใน {wait_seconds} วินาที "
+                            f"(ครั้งที่ {retry_attempt})"
+                        )
+                        time.sleep(wait_seconds)
+                        continue
+
+                    raise
 
             if total == 0:
                 st.warning("ไม่พบ 3xx capture ใน Wayback Machine")
@@ -1310,12 +1504,48 @@ if start_clicked or search_clicked:
         except requests.HTTPError as e:
             st.error(f"Wayback/CDX ตอบกลับผิดพลาด: {e}")
 
-        except requests.ConnectionError as e:
+        except requests.ConnectionError:
             st.error(
-                "🌐 ไม่สามารถเชื่อมต่อ Wayback Machine ได้ชั่วคราว\n\n"
-                "Wayback Machine อาจกำลังมีผู้ใช้งานจำนวนมาก หรือการเชื่อมต่อขัดข้องชั่วคราว "
-                "กรุณารอสักครู่แล้ว **Refresh หน้าเว็บและลองตรวจสอบอีกครั้ง**"
+                "🌐 ไม่สามารถเชื่อมต่อ Wayback Machine ได้ในขณะนี้"
             )
+
+            with st.spinner("กำลังตรวจสอบสาเหตุการเชื่อมต่อ..."):
+                diag = diagnose_wayback(domain)
+
+            if not diag["root_ok"]:
+                st.warning(
+                    "🔴 **WAYBACK BLOCKED / UNREACHABLE**\n\n"
+                    "Server ของเว็บนี้ไม่สามารถเชื่อมต่อ `web.archive.org` ได้โดยตรงในขณะนี้ "
+                    f"({diag['root_detail']})"
+                )
+
+            elif not diag["cdx_ok"]:
+                st.warning(
+                    "🟠 **CDX API มีปัญหา**\n\n"
+                    "`web.archive.org` ยังเข้าถึงได้ แต่ CDX API ที่ใช้ดึงรายการ captures "
+                    f"ตอบกลับไม่สำเร็จ ({diag['cdx_detail']})"
+                )
+
+            elif diag["replay_ok"] is False:
+                st.warning(
+                    "🟡 **REPLAY ENDPOINT มีปัญหา**\n\n"
+                    "CDX API ยังใช้งานได้ แต่ URL snapshot/replay ของ Wayback "
+                    f"เชื่อมต่อไม่สำเร็จ ({diag['replay_detail']})"
+                )
+
+            else:
+                st.info(
+                    "🟢 **Wayback Connectivity ดูปกติใน Diagnostic**\n\n"
+                    "การเชื่อมต่อทดสอบผ่าน แต่ Scan ก่อนหน้าอาจสะดุดชั่วคราว "
+                    "กรุณาลองตรวจสอบอีกครั้ง"
+                )
+
+            with st.expander("รายละเอียด Diagnostic"):
+                st.write({
+                    "Wayback root": diag["root_detail"],
+                    "CDX API": diag["cdx_detail"],
+                    "Replay": diag["replay_detail"] or "ไม่ได้ทดสอบ",
+                })
 
         except Exception as e:
             st.error(f"เกิดข้อผิดพลาด: {e}")
