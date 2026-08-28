@@ -787,16 +787,17 @@ def make_session():
         total=2,
         connect=2,
         read=1,
-        backoff_factor=0.25,
+        backoff_factor=0.8,
         status_forcelist=[429, 500, 502, 503, 504],
         allowed_methods=["GET"],
+        respect_retry_after_header=True,
         raise_on_status=False,
     )
     adapter = HTTPAdapter(
         max_retries=retry,
-        pool_connections=24,
-        pool_maxsize=24,
-        pool_block=False,
+        pool_connections=8,
+        pool_maxsize=8,
+        pool_block=True,
     )
     session.mount("https://", adapter)
     session.mount("http://", adapter)
@@ -880,7 +881,7 @@ def inspect_capture(timestamp, original):
     for replay in candidates:
         try:
             # Shorter timeout keeps dead/slow Wayback snapshots from blocking the scan.
-            r = session.get(replay, timeout=(3.5, 7), allow_redirects=False)
+            r = session.get(replay, timeout=(5, 12), allow_redirects=False)
             last_status = r.status_code
 
             target = clean_location(r.headers.get("Location", ""))
@@ -936,7 +937,10 @@ def get_all_3xx_captures(domain):
         "matchType": "domain",
     }
 
-    r = requests.get(CDX, params=params, headers=HEADERS, timeout=60)
+    # Use the retry-enabled shared session here too.
+    # The previous raw requests.get() meant the very first CDX connection
+    # could fail immediately even though replay requests had retry support.
+    r = SESSION.get(CDX, params=params, timeout=(8, 35))
     r.raise_for_status()
 
     data = r.json()
@@ -1017,9 +1021,8 @@ def scan(domain, mode):
     progress = st.progress(0, text="กำลังเตรียม Wayback captures...")
     status_box = st.empty()
 
-    # Conservative concurrency: much faster than sequential requests while
-    # avoiding an unnecessarily aggressive burst toward Internet Archive.
-    max_workers = 12 if full else 16
+    # Stable Turbo: bounded concurrency for speed without flooding Internet Archive.
+    max_workers = 4 if full else 5
     completed = 0
     results_by_index = {}
     cross_found = False
@@ -1030,6 +1033,9 @@ def scan(domain, mode):
         archived_status = row.get("statuscode", "")
 
         try:
+            # Stagger worker starts slightly so Streamlit Cloud does not hit
+            # Wayback with a burst of simultaneous new connections.
+            time.sleep((index % max_workers) * 0.10)
             target, replay, error, replay_http = inspect_capture(ts, source)
         except Exception as e:
             target, replay, error, replay_http = "", "", str(e), ""
