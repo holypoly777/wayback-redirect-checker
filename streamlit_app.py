@@ -957,7 +957,7 @@ def scan(domain, mode):
         return [], 0
 
     full = mode == "Full Scan"
-    todo = captures if full else build_quick_order(captures, max_checks=160)
+    todo = captures if full else build_quick_order(captures, max_checks=10000)
 
     progress = st.progress(0, text="กำลังเตรียม Wayback captures...")
     status_box = st.empty()
@@ -1177,7 +1177,7 @@ with s2:
             "ic-amber",
             "Quick Scan",
             "",
-            "ตรวจตัวอย่างสูงสุด 160 captures โดยเน้นช่วงล่าสุดและกระจายทั่ว timeline",
+            "ตรวจตัวอย่างสูงสุด 10,000 captures โดยเน้นช่วงล่าสุดและกระจายทั่ว timeline",
             "🕐 เร็วกว่า · เหมาะสำหรับเช็กเบื้องต้น",
             mode == "Quick Scan",
         ),
