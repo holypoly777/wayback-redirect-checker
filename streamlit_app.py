@@ -531,6 +531,83 @@ st.markdown(
         text-shadow: 0 1px 1px rgba(0,0,0,.08);
     }
 
+
+    /* =========================================================
+       DOMAIN INPUT CARD — restored premium style
+       ========================================================= */
+    .domain-section {
+        position: relative;
+        overflow: hidden;
+        margin: 10px 0 22px 0;
+        padding: 20px 22px 18px 22px;
+        border: 1px solid #dce3ee;
+        border-radius: 16px;
+        background:
+            linear-gradient(145deg, rgba(255,255,255,.98), rgba(248,250,255,.96));
+        box-shadow:
+            0 10px 28px rgba(32,45,81,.055),
+            0 1px 2px rgba(32,45,81,.02);
+    }
+
+    .domain-section::after {
+        content: "";
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        right: -65px;
+        top: -75px;
+        border-radius: 50%;
+        background:
+            radial-gradient(circle, rgba(86,112,216,.12), transparent 68%);
+        pointer-events: none;
+    }
+
+    .domain-heading {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 4px;
+        color: #1d2942;
+        font-size: 1.15rem;
+        font-weight: 800;
+        letter-spacing: -.015em;
+    }
+
+    .domain-sub {
+        position: relative;
+        z-index: 1;
+        margin-bottom: 13px;
+        color: #7a8497;
+        font-size: .86rem;
+        line-height: 1.5;
+    }
+
+    /* Input inside premium domain block */
+    [data-testid="stTextInput"] {
+        margin-top: -4px;
+        margin-bottom: 0;
+    }
+
+    [data-testid="stTextInput"] input {
+        background: #ffffff;
+        border: 1px solid #cfd8e7;
+        border-radius: 11px;
+        color: #172033;
+        min-height: 50px;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.9),
+            0 4px 12px rgba(35,50,90,.035);
+    }
+
+    [data-testid="stTextInput"] input:focus {
+        border-color: #5570d8;
+        box-shadow:
+            0 0 0 4px rgba(85,112,216,.10),
+            0 8px 18px rgba(35,50,90,.05);
+    }
+
 </style>
     """,
     unsafe_allow_html=True,
@@ -857,8 +934,19 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.subheader("ตรวจสอบ Domain")
+st.markdown(
+    """
+    <div class="domain-section">
+        <div class="domain-heading">🌐 ตรวจสอบ Domain</div>
+        <div class="domain-sub">
+            ใส่ชื่อโดเมนที่ต้องการตรวจ เช่น idea.me หรือ footballgibraltar.com
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
+# วางช่องกรอกต่อจากการ์ด โดยคง logic เดิมทั้งหมด
 domain_input = st.text_input(
     "Domain",
     placeholder="เช่น idea.me หรือ footballgibraltar.com",
